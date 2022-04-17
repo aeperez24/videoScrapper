@@ -1,0 +1,10 @@
+OutputPath: '/Users/andresperez/Documents/downloads'
+AnimeConfigurations:
+  - AnimeLink: 'link1'
+    AnimeName: 'name1'
+  - AnimeLink: 'link2'
+    AnimeName: 'name2'
+
+
+
+

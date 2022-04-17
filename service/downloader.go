@@ -76,9 +76,12 @@ func (dls DowloaderService) DownloadLastEpisode(animeLink string) (string, error
 	}
 
 	defer episodeResp.Body.Close()
+
 	log.Println(episodeResp.Header)
+
 	animeName := dls.getAnimeNameFromLink(animeLink)
 	episodeNumber := dls.ScrapService.GetEpisodeNumber(lastEpisodeLink)
+
 	err = dls.FileSystemSaver.Save(dls.AppConfiguration.OutputPath+"/"+animeName, episodeNumber+".mp4", episodeResp.Body)
 	if err != nil {
 		return "", err

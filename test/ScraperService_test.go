@@ -33,5 +33,5 @@ func TestGetMegaupLoadEpisodeLink(t *testing.T) {
 	scraperService := service.ScrapperServiceImpl{}
 
 	episodeLink, _ := scraperService.GetMegauploadEpisodeLink(htmlFile)
-	assert.Equal(t, "https://www.mp4upload.com/embed-a6xkfdysqdbu.html", episodeLink, "error getting downLoadLink")
+	assert.Equal(t, "https://www.mp4upload.com/a6xkfdysqdbu", episodeLink, "error getting downLoadLink")
 }
