@@ -52,7 +52,6 @@ func (ScrapperServiceImpl) GetMegauploadEpisodeLink(data io.Reader) (string, err
 	selection := doc.Find(".embed-responsive-item").First()
 	src, exist := selection.Attr("src")
 	if !exist {
-		log.Fatal("error geting required download code")
 		return "", errors.New("error src in iframe not found")
 	}
 	src = strings.Replace(src, "embed-", "", -1)
@@ -62,7 +61,6 @@ func (ScrapperServiceImpl) GetMegauploadEpisodeLink(data io.Reader) (string, err
 func (ScrapperServiceImpl) GetMegauploadCode(uri string) (string, error) {
 	splitedUri := strings.Split(uri, "https://www.mp4upload.com/")
 	if len(splitedUri) != 2 {
-		log.Println("error geting megaupload code ")
 		return "", errors.New("error geting megaupload code ")
 	}
 	return strings.Replace(splitedUri[1], ".html", "", -1), nil

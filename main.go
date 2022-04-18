@@ -18,7 +18,6 @@ func main() {
 	for i, _ := range chanArr {
 		chanArr[i] = make(chan error)
 	}
-	//TODO
 	ds := service.DowloaderService{
 		ScrapService:     service.ScrapperServiceImpl{},
 		Tracker:          service.TrackerServiceImpl{},
@@ -36,7 +35,7 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		} else {
-			log.Println("a download completed")
+			log.Println("download completed")
 		}
 
 	}
