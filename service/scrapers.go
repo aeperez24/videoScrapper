@@ -19,6 +19,7 @@ type ScrapperService interface {
 	GetMegauploadEpisodeLink(data io.Reader) (string, error)
 	GetMegauploadCode(string) (string, error)
 	GetEpisodeNumber(link string) string
+	GetLinkWithMirror(data io.Reader) (string, error)
 }
 
 type ScrapperServiceImpl struct{}
@@ -64,4 +65,16 @@ func (ScrapperServiceImpl) GetMegauploadCode(uri string) (string, error) {
 		return "", errors.New("error geting megaupload code ")
 	}
 	return strings.Replace(splitedUri[1], ".html", "", -1), nil
+}
+
+func (ScrapperServiceImpl) GetLinkWithMirror(data io.Reader) (string, error) {
+	doc, err := goquery.NewDocumentFromReader(data)
+	if err != nil {
+		return "", err
+	}
+
+	//log.Println(doc.Find(":contains(MP4UPLOAD) .episode_mirrors_hd :contains(HD)").First().Parent().Siblings().Attr("href"))
+	result, _ := doc.Find("a :contains(MP4UPLOAD) .episode_mirrors_hd :contains(HD)").Parent().Parent().Parent().Parent().First().Attr("href")
+	return result, nil
+
 }

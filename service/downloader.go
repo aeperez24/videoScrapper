@@ -99,3 +99,4 @@ func (dls DowloaderService) getAnimeNameFromLink(link string) string {
 	}
 	return ""
 }
+

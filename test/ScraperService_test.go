@@ -35,3 +35,15 @@ func TestGetMegaupLoadEpisodeLink(t *testing.T) {
 	episodeLink, _ := scraperService.GetMegauploadEpisodeLink(htmlFile)
 	assert.Equal(t, "https://www.mp4upload.com/a6xkfdysqdbu", episodeLink, "error getting downLoadLink")
 }
+
+func TestGetLinkWithMirror(t *testing.T) {
+	htmlFile, err := os.Open("inputs/episode.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer htmlFile.Close()
+
+	scraperService := service.ScrapperServiceImpl{}
+	episodeLink, _ := scraperService.GetLinkWithMirror(htmlFile)
+	assert.Equal(t, "https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Season-2-episode-2-mirror-3/", episodeLink, "error getting mirror")
+}

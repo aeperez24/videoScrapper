@@ -1,4 +1,4 @@
-OutputPath: '/Users/andresperez/Documents/downloads'
+OutputPath: 'output'
 AnimeConfigurations:
   - AnimeLink: 'link1'
     AnimeName: 'name1'
