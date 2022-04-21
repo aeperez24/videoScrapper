@@ -19,22 +19,12 @@ type GetSender interface {
 type GetWrapper struct {
 }
 
-type FileSystemSaver interface {
+type FileSystemManager interface {
 	Save(string, string, io.Reader) error
+	Read(path string, fileName string) ([]byte, error)
 }
 
-type FileSystemSaverWrapper struct {
-}
-
-func (wrapper GetWrapper) Get(url string) (*http.Response, error) {
-	return http.Get(url)
-}
-
-func (wrapper GetWrapper) PostForm(urlx string, formValues url.Values) (*http.Response, error) {
-	log.Println("posting to:" + urlx)
-	return http.PostForm(urlx, formValues)
-}
-func (wrapper FileSystemSaverWrapper) Save(filepath string, fileName string, reader io.Reader) error {
+func (wrapper FileSystemManagerWrapper) Save(filepath string, fileName string, reader io.Reader) error {
 	os.MkdirAll(filepath, os.ModePerm)
 	out, err := os.Create(filepath + "/" + fileName)
 	if err != nil {
@@ -44,6 +34,22 @@ func (wrapper FileSystemSaverWrapper) Save(filepath string, fileName string, rea
 	io.Copy(out, reader)
 	log.Println("file saved on " + filepath)
 	return nil
+}
+
+func (wrapper FileSystemManagerWrapper) Read(filepath string, fileName string) ([]byte, error) {
+	return os.ReadFile(filepath + "/" + fileName)
+}
+
+type FileSystemManagerWrapper struct {
+}
+
+func (wrapper GetWrapper) Get(url string) (*http.Response, error) {
+	return http.Get(url)
+}
+
+func (wrapper GetWrapper) PostForm(urlx string, formValues url.Values) (*http.Response, error) {
+	log.Println("posting to:" + urlx)
+	return http.PostForm(urlx, formValues)
 }
 
 func (wrapper GetWrapper) Post(urlx string, contentType string, reader io.Reader) (*http.Response, error) {

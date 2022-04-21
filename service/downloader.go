@@ -17,12 +17,12 @@ type AppConfiguration struct {
 }
 
 type DowloaderService struct {
-	ScrapService     ScrapperService
-	Tracker          TrackerService
-	GetSender        GetSender
-	DownloadUrl      string
-	FileSystemSaver  FileSystemSaver
-	AppConfiguration AppConfiguration
+	ScrapService      ScrapperService
+	Tracker           TrackerService
+	GetSender         GetSender
+	DownloadUrl       string
+	FileSystemManager FileSystemManager
+	AppConfiguration  AppConfiguration
 }
 
 func (dls DowloaderService) DownloadLastEpisode(animeLink string) (string, error) {
@@ -41,7 +41,9 @@ func (dls DowloaderService) DownloadLastEpisode(animeLink string) (string, error
 	}
 
 	lastEpisodeLink := episodes[0]
-	isAreadyDownloaded := dls.Tracker.IsPreviouslyDownloaded(animeLink, lastEpisodeLink)
+	episodeNumber := dls.ScrapService.GetEpisodeNumber(lastEpisodeLink)
+	animeName := dls.getAnimeNameFromLink(animeLink)
+	isAreadyDownloaded := dls.Tracker.IsPreviouslyDownloaded(animeName, episodeNumber)
 	if isAreadyDownloaded {
 		return lastEpisodeLink, nil
 	}
@@ -79,13 +81,11 @@ func (dls DowloaderService) DownloadLastEpisode(animeLink string) (string, error
 
 	log.Println(episodeResp.Header)
 
-	animeName := dls.getAnimeNameFromLink(animeLink)
-	episodeNumber := dls.ScrapService.GetEpisodeNumber(lastEpisodeLink)
-
-	err = dls.FileSystemSaver.Save(dls.AppConfiguration.OutputPath+"/"+animeName, episodeNumber+".mp4", episodeResp.Body)
+	err = dls.FileSystemManager.Save(dls.AppConfiguration.OutputPath+"/"+animeName, episodeNumber+".mp4", episodeResp.Body)
 	if err != nil {
 		return "", err
 	}
+	dls.Tracker.SaveAlreadyDownloaded(animeName, episodeNumber)
 	return lastEpisodeLink, nil
 
 }
@@ -99,4 +99,3 @@ func (dls DowloaderService) getAnimeNameFromLink(link string) string {
 	}
 	return ""
 }
-

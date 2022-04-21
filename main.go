@@ -19,11 +19,11 @@ func main() {
 		chanArr[i] = make(chan error)
 	}
 	ds := service.DowloaderService{
-		ScrapService:     service.ScrapperServiceImpl{},
-		Tracker:          service.TrackerServiceImpl{},
-		GetSender:        service.GetWrapper{},
-		FileSystemSaver:  service.FileSystemSaverWrapper{},
-		AppConfiguration: appConfig,
+		ScrapService:      service.ScrapperServiceImpl{},
+		Tracker:           service.TrackerServiceImpl{FileSystemManager: service.FileSystemManagerWrapper{}},
+		GetSender:         service.GetWrapper{},
+		FileSystemManager: service.FileSystemManagerWrapper{},
+		AppConfiguration:  appConfig,
 	}
 
 	for i, config := range appConfig.AnimeConfigurations {
