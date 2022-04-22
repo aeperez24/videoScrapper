@@ -17,7 +17,6 @@ type TrackerServiceImpl struct {
 	FileSystemManager FileSystemManager
 }
 
-//TODO
 func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(animeName string, episodeNumber string) bool {
 	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, animeName)
 	if byteArr == nil {
@@ -34,7 +33,6 @@ func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(animeName string
 	return false
 }
 
-//TODO
 func (trackerService TrackerServiceImpl) SaveAlreadyDownloaded(animeName string, episodeNumber string) {
 	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, animeName)
 	if byteArr == nil {
