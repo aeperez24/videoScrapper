@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ type AppConfiguration struct {
 }
 
 type GeneralDownloadService interface {
-	GetSortedEpisodesAvaliable(serieLink string) []string
+	GetSortedEpisodesAvaliable(serieLink string) ([]string, error)
 	DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, error)
 }
 
@@ -59,7 +60,12 @@ func (dm DownloaderManager) DownloadLastEpisode(animeLink string) (string, error
 		return "", errors.New(fmt.Sprintf("downloader not found for %v", animeConfig.Provider))
 	}
 
-	episodesAvaliable := downloadService.GetSortedEpisodesAvaliable(animeLink)
+	episodesAvaliable, err := downloadService.GetSortedEpisodesAvaliable(animeLink)
+
+	if err != nil {
+		return "", err
+	}
+
 	lastEpisodeAvaliable := episodesAvaliable[len(episodesAvaliable)-1]
 	isDownloaded := dm.Tracker.IsPreviouslyDownloaded(animeLink, lastEpisodeAvaliable)
 	if isDownloaded {
@@ -81,18 +87,10 @@ type DowloaderService struct {
 }
 
 func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, error) {
-	episodesPage, err := dls.GetSender.Get(serieLink)
-	if err != nil {
-		return nil, err
-	}
-	defer episodesPage.Body.Close()
+	episodes, err := dls.GetSortedEpisodesAvaliable(serieLink)
 
-	episodes, err := dls.ScrapService.GetEpisodesList(episodesPage.Body)
 	if err != nil {
 		return nil, err
-	}
-	if len(episodes) == 0 {
-		return nil, errors.New("there is not any episode avaliable to download")
 	}
 
 	episodeLink, _ := dls.getLinkForEpisodeNumber(episodes, episodeNumber)
@@ -119,6 +117,22 @@ func (ds DowloaderService) getLinkForEpisodeNumber(espisodeLinks []string, episo
 		}
 	}
 	return "", errors.New("episode number download link not found")
+}
+
+func (dls DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]string, error) {
+
+	episodesPage, err := dls.GetSender.Get(serieLink)
+	if err != nil {
+		return nil, err
+	}
+	defer episodesPage.Body.Close()
+
+	episodes, err := dls.ScrapService.GetEpisodesList(episodesPage.Body)
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(episodes)
+	return episodes, nil
 }
 
 func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader, error) {
