@@ -81,43 +81,55 @@ type DowloaderService struct {
 }
 
 func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, error) {
-	episodesPage, err := dls.GetSender.Get(animeLink)
+	episodesPage, err := dls.GetSender.Get(serieLink)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer episodesPage.Body.Close()
 
 	episodes, err := dls.ScrapService.GetEpisodesList(episodesPage.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if len(episodes) == 0 {
-		return "", errors.New("there is not any episode avaliable to download")
+		return nil, errors.New("there is not any episode avaliable to download")
 	}
 
-	lastEpisodeLink := episodes[0]
-	episodeNumber := dls.ScrapService.GetEpisodeNumber(lastEpisodeLink)
-	animeName := dls.getAnimeNameFromLink(animeLink)
-	isAreadyDownloaded := dls.Tracker.IsPreviouslyDownloaded(animeName, episodeNumber)
-	if isAreadyDownloaded {
-		return lastEpisodeLink, nil
-	}
+	episodeLink, _ := dls.getLinkForEpisodeNumber(episodes, episodeNumber)
 
-	lastEpisodePage, _ := dls.GetSender.Get(lastEpisodeLink[0:len(lastEpisodeLink)-1] + "-mirror-4")
-	defer lastEpisodePage.Body.Close()
-	downloadUrl, err := dls.ScrapService.GetMegauploadEpisodeLink(lastEpisodePage.Body)
+	episodePage, _ := dls.GetSender.Get(episodeLink)
+	defer episodePage.Body.Close()
+	linkWithMirror, _ := dls.ScrapService.GetLinkWithMirror(episodePage.Body)
+	pageWithMirror, _ := dls.GetSender.Get(linkWithMirror)
+
+	downloadUrl, err := dls.ScrapService.GetMegauploadEpisodeLink(pageWithMirror.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	log.Println("url is " + downloadUrl)
+	return dls.downloadFromM4upload(downloadUrl)
+
+}
+
+func (ds DowloaderService) getLinkForEpisodeNumber(espisodeLinks []string, episodeNumber string) (string, error) {
+
+	for _, episodeLink := range espisodeLinks {
+		if ds.ScrapService.GetEpisodeNumber(episodeLink) == episodeNumber {
+			return episodeLink, nil
+		}
+	}
+	return "", errors.New("episode number download link not found")
+}
+
+func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader, error) {
 	code, err := dls.ScrapService.GetMegauploadCode(downloadUrl)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	payload := fmt.Sprintf("op=download2&id=%s&method_free=+", code)
 	postResult, err := dls.GetSender.Request(downloadUrl, "POST", strings.NewReader(payload))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer postResult.Body.Close()
 	downloadLink := postResult.Header.Get("location")
@@ -129,28 +141,8 @@ func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 
 	episodeResp, err := dls.GetSender.RequestWithHeaders(downloadLink, "GET", nil, headers)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	defer episodeResp.Body.Close()
-
-	log.Println(episodeResp.Header)
-
-	err = dls.FileSystemManager.Save(dls.AppConfiguration.OutputPath+"/"+animeName, episodeNumber+".mp4", episodeResp.Body)
-	if err != nil {
-		return "", err
-	}
-	dls.Tracker.SaveAlreadyDownloaded(animeName, episodeNumber)
-	return lastEpisodeLink, nil
-
-}
-
-func (dls DowloaderService) getAnimeNameFromLink(link string) string {
-	animeConfgs := dls.AppConfiguration.AnimeConfigurations
-	for _, config := range animeConfgs {
-		if config.AnimeLink == link {
-			return config.AnimeName
-		}
-	}
-	return ""
+	return episodeResp.Body, nil
 }
