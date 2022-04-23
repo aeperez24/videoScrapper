@@ -72,6 +72,9 @@ func (ScrapperServiceImpl) GetLinkWithMirror(data io.Reader) (string, error) {
 
 	//log.Println(doc.Find(":contains(MP4UPLOAD) .episode_mirrors_hd :contains(HD)").First().Parent().Siblings().Attr("href"))
 	result, _ := doc.Find("a :contains(MP4UPLOAD) .episode_mirrors_hd :contains(HD)").Parent().Parent().Parent().Parent().First().Attr("href")
+	if result == "" {
+		return result, errors.New("link for m4upload mirror  hd not found")
+	}
 	return result, nil
 
 }

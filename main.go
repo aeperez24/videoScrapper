@@ -16,9 +16,9 @@ func main() {
 		log.Panic(err)
 	}
 
-	chanArr := make([]chan error, len(appConfig.SerieConfigurations))
+	chanArr := make([]chan []error, len(appConfig.SerieConfigurations))
 	for i, _ := range chanArr {
-		chanArr[i] = make(chan error)
+		chanArr[i] = make(chan []error)
 	}
 	ds := animeshow.DowloaderService{
 		ScrapService:     animeshow.ScrapperServiceImpl{},
@@ -33,22 +33,23 @@ func main() {
 	}
 
 	for i, config := range appConfig.SerieConfigurations {
-		go asyncDownload(downloaderManager.DownloadLastEpisode, config.SerieLink, chanArr[i])
+		go asyncDownload(downloaderManager.DownloadAllEpisodes, config.SerieLink, chanArr[i])
 	}
 
 	for _, channel := range chanArr {
-		err = <-channel
-		if err != nil {
-			log.Println(err)
-		} else {
-			log.Println("download completed")
-		}
-
+		errList := <-channel
+		printErrorList(errList)
 	}
 
 }
 
-func asyncDownload(fn func(string) (string, error), in string, errorChanel chan error) {
-	_, err := fn(in)
+func asyncDownload(fn func(string) []error, in string, errorChanel chan []error) {
+	err := fn(in)
 	errorChanel <- err
+}
+
+func printErrorList(errList []error) {
+	for _, err := range errList {
+		log.Println(err)
+	}
 }

@@ -39,6 +39,9 @@ func (trackerService TrackerServiceImpl) SaveAlreadyDownloaded(SerieName string,
 	stringFile := fmt.Sprintf("%s", byteArr)
 	stringFile = stringFile + " " + episodeNumber
 	reader := strings.NewReader(stringFile)
-	trackerService.FileSystemManager.Save(TRACKING_FILES_PATH, SerieName, reader)
-
+	err := trackerService.FileSystemManager.Save(TRACKING_FILES_PATH, SerieName, reader)
+	if err != nil {
+		fmt.Println("error saving download track")
+		fmt.Println(err)
+	}
 }

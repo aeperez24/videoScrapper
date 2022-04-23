@@ -29,7 +29,10 @@ func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 	}
 	episodePage, _ := dls.GetSender.Get(episodeLink)
 	defer episodePage.Body.Close()
-	linkWithMirror, _ := dls.ScrapService.GetLinkWithMirror(episodePage.Body)
+	linkWithMirror, err := dls.ScrapService.GetLinkWithMirror(episodePage.Body)
+	if err != nil {
+		return nil, err
+	}
 	pageWithMirror, _ := dls.GetSender.Get(linkWithMirror)
 
 	downloadUrl, err := dls.ScrapService.GetMegauploadEpisodeLink(pageWithMirror.Body)

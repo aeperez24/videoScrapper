@@ -43,21 +43,26 @@ func (dm DownloaderManager) getConfigFromLink(link string) (SerieConfiguration, 
 	}
 	return SerieConfiguration{}, errors.New(fmt.Sprintf("configuratio not found for %v", link))
 }
-func (dm DownloaderManager) DownloadLastEpisode(SerieLink string) (string, error) {
+func (dm DownloaderManager) DownloadLastEpisode(SerieLink string) []error {
 	animeConfig, err := dm.getConfigFromLink(SerieLink)
 	if err != nil {
-		return "", err
+		return []error{err}
 	}
 	downloadService, ok := dm.DownloaderServices[animeConfig.Provider]
 	if !ok {
-		return "", errors.New(fmt.Sprintf("downloader not found for %v", animeConfig.Provider))
+		return []error{errors.New(fmt.Sprintf("downloader not found for %v", animeConfig.Provider))}
 	}
 	episodesAvaliable, err := downloadService.GetSortedEpisodesAvaliable(SerieLink)
 	if err != nil {
-		return "", err
+		return []error{err}
 	}
+
 	lastEpisodeAvaliable := episodesAvaliable[len(episodesAvaliable)-1]
-	return dm.downloadEpisode(SerieLink, lastEpisodeAvaliable, animeConfig, downloadService)
+	_, err = dm.downloadEpisode(SerieLink, lastEpisodeAvaliable, animeConfig, downloadService)
+	if err != nil {
+		return []error{err}
+	}
+	return []error{}
 }
 
 func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber string,
@@ -73,11 +78,32 @@ func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber stri
 		return "", err
 	}
 	dm.FileSystemManager.Save(dm.AppConfiguration.OutputPath+"/"+serieConfig.SerieName, episodeNumber, episodeReader)
-	dm.Tracker.SaveAlreadyDownloaded(serieLink, episodeNumber)
+	log.Println("saving already downloaded")
+	log.Printf("%s : %s", serieLink, episodeNumber)
+	dm.Tracker.SaveAlreadyDownloaded(serieConfig.SerieName, episodeNumber)
 	return "", nil
 }
 
-func (dm DownloaderManager) DownloadAllServices(SerieLink string) (string, error) {
-
-	return "", nil
+func (dm DownloaderManager) DownloadAllEpisodes(SerieLink string) []error {
+	animeConfig, err := dm.getConfigFromLink(SerieLink)
+	if err != nil {
+		return []error{err}
+	}
+	downloadService, ok := dm.DownloaderServices[animeConfig.Provider]
+	if !ok {
+		return []error{errors.New(fmt.Sprintf("downloader not found for %v", animeConfig.Provider))}
+	}
+	episodesAvaliable, err := downloadService.GetSortedEpisodesAvaliable(SerieLink)
+	if err != nil {
+		return []error{err}
+	}
+	errorList := make([]error, 0)
+	for _, episode := range episodesAvaliable {
+		log.Println(episode)
+		_, err := dm.downloadEpisode(SerieLink, episode, animeConfig, downloadService)
+		if err != nil {
+			errorList = append(errorList, err)
+		}
+	}
+	return errorList
 }
