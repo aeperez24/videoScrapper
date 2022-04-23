@@ -77,7 +77,7 @@ func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber stri
 	if err != nil {
 		return "", err
 	}
-	dm.FileSystemManager.Save(dm.AppConfiguration.OutputPath+"/"+serieConfig.SerieName+"."+format, episodeNumber, episodeReader)
+	dm.FileSystemManager.Save(dm.AppConfiguration.OutputPath+"/"+serieConfig.SerieName, episodeNumber+"."+format, episodeReader)
 	log.Println("saving already downloaded")
 	log.Printf("%s : %s", serieLink, episodeNumber)
 	dm.Tracker.SaveAlreadyDownloaded(serieConfig.SerieName, episodeNumber)
