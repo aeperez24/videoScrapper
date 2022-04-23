@@ -2,6 +2,7 @@ package main
 
 import (
 	"aeperez24/animewatcher/service"
+	"aeperez24/animewatcher/vendors/animeshow"
 	"log"
 )
 
@@ -14,12 +15,12 @@ func main() {
 		log.Panic(err)
 	}
 
-	chanArr := make([]chan error, len(appConfig.AnimeConfigurations))
+	chanArr := make([]chan error, len(appConfig.SerieConfigurations))
 	for i, _ := range chanArr {
 		chanArr[i] = make(chan error)
 	}
-	ds := service.DowloaderService{
-		ScrapService:     service.ScrapperServiceImpl{},
+	ds := animeshow.DowloaderService{
+		ScrapService:     animeshow.ScrapperServiceImpl{},
 		GetSender:        service.GetWrapper{},
 		AppConfiguration: appConfig,
 	}
@@ -30,8 +31,8 @@ func main() {
 		AppConfiguration: appConfig, DownloaderServices: servicesMap, Tracker: service.TrackerServiceImpl{FileSystemManager: service.FileSystemManagerWrapper{}},
 	}
 
-	for i, config := range appConfig.AnimeConfigurations {
-		go asyncDownload(downloaderManager.DownloadLastEpisode, config.AnimeLink, chanArr[i])
+	for i, config := range appConfig.SerieConfigurations {
+		go asyncDownload(downloaderManager.DownloadLastEpisode, config.SerieLink, chanArr[i])
 	}
 
 	for _, channel := range chanArr {

@@ -1,11 +1,11 @@
 OutputPath: '/Users/andresperez/Documents/downloads'
-AnimeConfigurations:
-  - AnimeLink: 'https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Season-2'
-    AnimeName: 'risingShield'
+SerieConfigurations:
+  - SerieLink: 'https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Season-2'
+    SerieName: 'risingShield'
     Provider: 'animeshow'
 
-  - AnimeLink: 'https://www2.animeshow.tv/Tomodachi-Game'
-    AnimeName: 'tomodachiGame'
+  - SerieLink: 'https://www2.animeshow.tv/Tomodachi-Game'
+    SerieName: 'tomodachiGame'
     Provider: 'animeshow'
 
 

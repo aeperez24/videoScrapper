@@ -8,16 +8,16 @@ import (
 const TRACKING_FILES_PATH = "tracking_files"
 
 type TrackerService interface {
-	IsPreviouslyDownloaded(animeLink string, episodelink string) bool
-	SaveAlreadyDownloaded(animeLink string, episodelink string)
+	IsPreviouslyDownloaded(SerieLink string, episodelink string) bool
+	SaveAlreadyDownloaded(SerieLink string, episodelink string)
 }
 
 type TrackerServiceImpl struct {
 	FileSystemManager FileSystemManager
 }
 
-func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(animeName string, episodeNumber string) bool {
-	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, animeName)
+func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(SerieName string, episodeNumber string) bool {
+	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, SerieName)
 	if byteArr == nil {
 		return false
 	}
@@ -31,14 +31,14 @@ func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(animeName string
 	return false
 }
 
-func (trackerService TrackerServiceImpl) SaveAlreadyDownloaded(animeName string, episodeNumber string) {
-	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, animeName)
+func (trackerService TrackerServiceImpl) SaveAlreadyDownloaded(SerieName string, episodeNumber string) {
+	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, SerieName)
 	if byteArr == nil {
 		byteArr = []byte("")
 	}
 	stringFile := fmt.Sprintf("%s", byteArr)
 	stringFile = stringFile + " " + episodeNumber
 	reader := strings.NewReader(stringFile)
-	trackerService.FileSystemManager.Save(TRACKING_FILES_PATH, animeName, reader)
+	trackerService.FileSystemManager.Save(TRACKING_FILES_PATH, SerieName, reader)
 
 }
