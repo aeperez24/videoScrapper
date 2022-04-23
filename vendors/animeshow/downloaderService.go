@@ -16,28 +16,28 @@ type DowloaderService struct {
 	AppConfiguration service.AppConfiguration
 }
 
-func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, error) {
+func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, string, error) {
 	episodes, err := dls.getEpisodesAvaliable(serieLink)
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	episodeLink, err := dls.getLinkForEpisodeNumber(episodes, episodeNumber)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	episodePage, _ := dls.GetSender.Get(episodeLink)
 	defer episodePage.Body.Close()
 	linkWithMirror, err := dls.ScrapService.GetLinkWithMirror(episodePage.Body)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	pageWithMirror, _ := dls.GetSender.Get(linkWithMirror)
 
 	downloadUrl, err := dls.ScrapService.GetMegauploadEpisodeLink(pageWithMirror.Body)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	log.Println("url is " + downloadUrl)
 	return dls.downloadFromM4upload(downloadUrl)
@@ -85,15 +85,15 @@ func (dls DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]stri
 	return result, nil
 }
 
-func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader, error) {
+func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader, string, error) {
 	code, err := dls.ScrapService.GetMegauploadCode(downloadUrl)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	payload := fmt.Sprintf("op=download2&id=%s&method_free=+", code)
 	postResult, err := dls.GetSender.Request(downloadUrl, "POST", strings.NewReader(payload))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer postResult.Body.Close()
 	downloadLink := postResult.Header.Get("location")
@@ -105,8 +105,8 @@ func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader,
 
 	episodeResp, err := dls.GetSender.RequestWithHeaders(downloadLink, "GET", nil, headers)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return episodeResp.Body, nil
+	return episodeResp.Body, "mp4", nil
 }
