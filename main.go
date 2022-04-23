@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aeperez24/animewatcher/port"
 	"aeperez24/animewatcher/service"
 	"aeperez24/animewatcher/vendors/animeshow"
 	"log"
@@ -25,7 +26,7 @@ func main() {
 		AppConfiguration: appConfig,
 	}
 
-	servicesMap := map[string]service.GeneralDownloadService{}
+	servicesMap := map[string]port.GeneralDownloadService{}
 	servicesMap["animeshow"] = ds
 	downloaderManager := service.DownloaderManager{FileSystemManager: service.FileSystemManagerWrapper{},
 		AppConfiguration: appConfig, DownloaderServices: servicesMap, Tracker: service.TrackerServiceImpl{FileSystemManager: service.FileSystemManagerWrapper{}},

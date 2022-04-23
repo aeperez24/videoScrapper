@@ -1,9 +1,9 @@
 package service
 
 import (
+	"aeperez24/animewatcher/port"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 )
 
@@ -17,15 +17,10 @@ type AppConfiguration struct {
 	OutputPath          string
 }
 
-type GeneralDownloadService interface {
-	GetSortedEpisodesAvaliable(serieLink string) ([]string, error)
-	DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, error)
-}
-
 type DownloaderManager struct {
 	FileSystemManager  FileSystemManager
 	AppConfiguration   AppConfiguration
-	DownloaderServices map[string]GeneralDownloadService
+	DownloaderServices map[string]port.GeneralDownloadService
 	Tracker            TrackerService
 }
 
@@ -57,23 +52,32 @@ func (dm DownloaderManager) DownloadLastEpisode(SerieLink string) (string, error
 	if !ok {
 		return "", errors.New(fmt.Sprintf("downloader not found for %v", animeConfig.Provider))
 	}
-
 	episodesAvaliable, err := downloadService.GetSortedEpisodesAvaliable(SerieLink)
-
 	if err != nil {
 		return "", err
 	}
 	lastEpisodeAvaliable := episodesAvaliable[len(episodesAvaliable)-1]
-	isDownloaded := dm.Tracker.IsPreviouslyDownloaded(animeConfig.SerieName, lastEpisodeAvaliable)
+	return dm.downloadEpisode(SerieLink, lastEpisodeAvaliable, animeConfig, downloadService)
+}
+
+func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber string,
+	serieConfig SerieConfiguration, downloadService port.GeneralDownloadService) (string, error) {
+
+	isDownloaded := dm.Tracker.IsPreviouslyDownloaded(serieConfig.SerieName, episodeNumber)
 	if isDownloaded {
-		log.Default().Printf("episode %v for link %v is already downloaded", lastEpisodeAvaliable, SerieLink)
+		log.Default().Printf("episode %v for link %v is already downloaded", episodeNumber, serieLink)
 		return "", nil
 	}
-	episodeReader, err := downloadService.DownloadEpisodeFromLink(SerieLink, lastEpisodeAvaliable)
+	episodeReader, err := downloadService.DownloadEpisodeFromLink(serieLink, episodeNumber)
 	if err != nil {
 		return "", err
 	}
-	dm.FileSystemManager.Save(dm.AppConfiguration.OutputPath+"/"+animeConfig.SerieName, lastEpisodeAvaliable, episodeReader)
-	dm.Tracker.SaveAlreadyDownloaded(SerieLink, lastEpisodeAvaliable)
+	dm.FileSystemManager.Save(dm.AppConfiguration.OutputPath+"/"+serieConfig.SerieName, episodeNumber, episodeReader)
+	dm.Tracker.SaveAlreadyDownloaded(serieLink, episodeNumber)
+	return "", nil
+}
+
+func (dm DownloaderManager) DownloadAllServices(SerieLink string) (string, error) {
+
 	return "", nil
 }
