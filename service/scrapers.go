@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"io"
-	"log"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -34,14 +33,12 @@ func (ScrapperServiceImpl) GetEpisodesList(data io.Reader) ([]string, error) {
 		val, _ := s.Attr("href")
 		episodesArr = append(episodesArr, val)
 	})
-	log.Println(episodesArr)
 	return episodesArr, nil
 }
 
 func (ScrapperServiceImpl) GetEpisodeNumber(link string) string {
 	episodeNumber := (strings.Split(link, "-episode-"))[1]
 	episodeNumber = strings.ReplaceAll(episodeNumber, "/", "")
-	log.Println("episode number " + episodeNumber)
 	return episodeNumber
 }
 

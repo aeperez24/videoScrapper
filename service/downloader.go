@@ -45,7 +45,7 @@ func (dm DownloaderManager) getConfigFromLink(link string) (AnimeConfiguration, 
 	animeConfgs := dm.AppConfiguration.AnimeConfigurations
 	for _, config := range animeConfgs {
 		if config.AnimeLink == link {
-			return AnimeConfiguration{}, nil
+			return config, nil
 		}
 	}
 	return AnimeConfiguration{}, errors.New(fmt.Sprintf("configuratio not found for %v", link))
@@ -65,11 +65,11 @@ func (dm DownloaderManager) DownloadLastEpisode(animeLink string) (string, error
 	if err != nil {
 		return "", err
 	}
-
 	lastEpisodeAvaliable := episodesAvaliable[len(episodesAvaliable)-1]
-	isDownloaded := dm.Tracker.IsPreviouslyDownloaded(animeLink, lastEpisodeAvaliable)
+	isDownloaded := dm.Tracker.IsPreviouslyDownloaded(animeConfig.AnimeName, lastEpisodeAvaliable)
 	if isDownloaded {
 		log.Default().Printf("episode %v for link %v is already downloaded", lastEpisodeAvaliable, animeLink)
+		return "", nil
 	}
 	episodeReader, err := downloadService.DownloadEpisodeFromLink(animeLink, lastEpisodeAvaliable)
 	if err != nil {
@@ -87,14 +87,16 @@ type DowloaderService struct {
 }
 
 func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, error) {
-	episodes, err := dls.GetSortedEpisodesAvaliable(serieLink)
+	episodes, err := dls.getEpisodesAvaliable(serieLink)
 
 	if err != nil {
 		return nil, err
 	}
 
-	episodeLink, _ := dls.getLinkForEpisodeNumber(episodes, episodeNumber)
-
+	episodeLink, err := dls.getLinkForEpisodeNumber(episodes, episodeNumber)
+	if err != nil {
+		return nil, err
+	}
 	episodePage, _ := dls.GetSender.Get(episodeLink)
 	defer episodePage.Body.Close()
 	linkWithMirror, _ := dls.ScrapService.GetLinkWithMirror(episodePage.Body)
@@ -110,7 +112,6 @@ func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 }
 
 func (ds DowloaderService) getLinkForEpisodeNumber(espisodeLinks []string, episodeNumber string) (string, error) {
-
 	for _, episodeLink := range espisodeLinks {
 		if ds.ScrapService.GetEpisodeNumber(episodeLink) == episodeNumber {
 			return episodeLink, nil
@@ -119,7 +120,7 @@ func (ds DowloaderService) getLinkForEpisodeNumber(espisodeLinks []string, episo
 	return "", errors.New("episode number download link not found")
 }
 
-func (dls DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]string, error) {
+func (dls DowloaderService) getEpisodesAvaliable(serieLink string) ([]string, error) {
 
 	episodesPage, err := dls.GetSender.Get(serieLink)
 	if err != nil {
@@ -133,6 +134,22 @@ func (dls DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]stri
 	}
 	sort.Strings(episodes)
 	return episodes, nil
+}
+
+func (dls DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]string, error) {
+
+	episdesLinks, err := dls.getEpisodesAvaliable(serieLink)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]string, 0)
+
+	for _, episodeLink := range episdesLinks {
+
+		result = append(result, dls.ScrapService.GetEpisodeNumber(episodeLink))
+	}
+	sort.Strings(result)
+	return result, nil
 }
 
 func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader, error) {

@@ -13,7 +13,7 @@ func TestGetConfig(t *testing.T) {
 	log.Println(err)
 	assert.Nil(t, err, "Error parsing")
 	animeConfigurations := []service.AnimeConfiguration{
-		{AnimeLink: "link1", AnimeName: "name1"}, {AnimeLink: "link2", AnimeName: "name2"}}
+		{AnimeLink: "link1", AnimeName: "name1", Provider: "provider"}, {AnimeLink: "link2", AnimeName: "name2", Provider: "provider"}}
 	expected := service.AppConfiguration{AnimeConfigurations: animeConfigurations, OutputPath: "output"}
 	assert.Equal(t, expected, config, "config is not equals to expected")
 }

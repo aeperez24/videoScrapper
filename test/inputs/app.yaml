@@ -2,8 +2,11 @@ OutputPath: 'output'
 AnimeConfigurations:
   - AnimeLink: 'link1'
     AnimeName: 'name1'
+    Provider: 'provider'
   - AnimeLink: 'link2'
     AnimeName: 'name2'
+    Provider: 'provider'
+
 
 
 

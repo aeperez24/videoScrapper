@@ -19,15 +19,19 @@ func main() {
 		chanArr[i] = make(chan error)
 	}
 	ds := service.DowloaderService{
-		ScrapService:      service.ScrapperServiceImpl{},
-		Tracker:           service.TrackerServiceImpl{FileSystemManager: service.FileSystemManagerWrapper{}},
-		GetSender:         service.GetWrapper{},
-		FileSystemManager: service.FileSystemManagerWrapper{},
-		AppConfiguration:  appConfig,
+		ScrapService:     service.ScrapperServiceImpl{},
+		GetSender:        service.GetWrapper{},
+		AppConfiguration: appConfig,
+	}
+
+	servicesMap := map[string]service.GeneralDownloadService{}
+	servicesMap["animeshow"] = ds
+	downloaderManager := service.DownloaderManager{FileSystemManager: service.FileSystemManagerWrapper{},
+		AppConfiguration: appConfig, DownloaderServices: servicesMap, Tracker: service.TrackerServiceImpl{FileSystemManager: service.FileSystemManagerWrapper{}},
 	}
 
 	for i, config := range appConfig.AnimeConfigurations {
-		go asyncDownload(ds.DownloadLastEpisode, config.AnimeLink, chanArr[i])
+		go asyncDownload(downloaderManager.DownloadLastEpisode, config.AnimeLink, chanArr[i])
 	}
 
 	for _, channel := range chanArr {

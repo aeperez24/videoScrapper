@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -24,7 +23,6 @@ func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(animeName string
 	}
 	stringFile := fmt.Sprintf("%s", byteArr)
 	episodesNumber := strings.Split(stringFile, " ")
-	log.Println(episodesNumber)
 	for _, ep := range episodesNumber {
 		if ep == episodeNumber {
 			return true
