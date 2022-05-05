@@ -4,7 +4,6 @@ import (
 	"aeperez24/animewatcher/port"
 	"errors"
 	"fmt"
-	"log"
 )
 
 type SerieConfiguration struct {
@@ -70,7 +69,6 @@ func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber stri
 
 	isDownloaded := dm.Tracker.IsPreviouslyDownloaded(serieConfig.SerieName, episodeNumber)
 	if isDownloaded {
-		log.Default().Printf("episode %v for link %v is already downloaded", episodeNumber, serieLink)
 		return "", nil
 	}
 	episodeReader, format, err := downloadService.DownloadEpisodeFromLink(serieLink, episodeNumber)
@@ -78,8 +76,6 @@ func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber stri
 		return "", err
 	}
 	dm.FileSystemManager.Save(dm.AppConfiguration.OutputPath+"/"+serieConfig.SerieName, episodeNumber+"."+format, episodeReader)
-	log.Println("saving already downloaded")
-	log.Printf("%s : %s", serieLink, episodeNumber)
 	dm.Tracker.SaveAlreadyDownloaded(serieConfig.SerieName, episodeNumber)
 	return "", nil
 }
@@ -99,7 +95,6 @@ func (dm DownloaderManager) DownloadAllEpisodes(SerieLink string) []error {
 	}
 	errorList := make([]error, 0)
 	for _, episode := range episodesAvaliable {
-		log.Println(episode)
 		_, err := dm.downloadEpisode(SerieLink, episode, animeConfig, downloadService)
 		if err != nil {
 			errorList = append(errorList, err)

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -21,10 +22,11 @@ func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(SerieName string
 	if byteArr == nil {
 		return false
 	}
+	log.Printf("serie %s episode(%s)", SerieName, episodeNumber)
 	stringFile := fmt.Sprintf("%s", byteArr)
 	episodesNumber := strings.Split(stringFile, " ")
 	for _, ep := range episodesNumber {
-		if ep == episodeNumber {
+		if strings.TrimSpace(ep) == strings.TrimSpace(episodeNumber) {
 			return true
 		}
 	}
@@ -37,7 +39,8 @@ func (trackerService TrackerServiceImpl) SaveAlreadyDownloaded(SerieName string,
 		byteArr = []byte("")
 	}
 	stringFile := fmt.Sprintf("%s", byteArr)
-	stringFile = stringFile + " " + episodeNumber
+
+	stringFile = stringFile + " " + strings.TrimSpace(episodeNumber)
 	reader := strings.NewReader(stringFile)
 	err := trackerService.FileSystemManager.Save(TRACKING_FILES_PATH, SerieName, reader)
 	if err != nil {

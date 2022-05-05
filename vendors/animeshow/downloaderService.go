@@ -100,7 +100,7 @@ func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader,
 
 	headers := make(map[string]string)
 	headers["Referer"] = "https://www.mp4upload.com/"
-	downloadLink = strings.Replace(downloadLink, "www12", "www14", 1)
+
 	log.Println("downloading from" + downloadLink)
 
 	episodeResp, err := dls.GetSender.RequestWithHeaders(downloadLink, "GET", nil, headers)
