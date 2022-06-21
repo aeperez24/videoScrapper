@@ -2,20 +2,28 @@ package cuevana
 
 import (
 	"aeperez24/animewatcher/service"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
 )
 
+const proxies_url string = "https://www.proxy-list.download/api/v2/get?l=en&t=https"
+
 type DownloaderService struct {
 	ScrapService ScrapperService
 	GetSender    service.GetSender
+	proxies      []string
 }
 
 func (ds DownloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]string, error) {
 
 	linksList, err := ds.GetSortedEpisodesLinks(serieLink)
+	if err != nil {
+		return nil, err
+	}
 	result := make([]string, 0)
 	for _, link := range linksList {
 		result = append(result, ds.ScrapService.getEpisodeName(link))
@@ -57,8 +65,8 @@ func (ds DownloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 }
 
 func (ds DownloaderService) downloadFromFichier(fichierLink string, adz string) (io.Reader, error) {
-
-	resp, err := ds.GetSender.PostForm(fichierLink, url.Values{"adz": {adz}, "dl_no_ssl": {"on"}, "dlinline": {"on"}})
+	cl := ds.getHttpClientWithProxy()
+	resp, err := cl.PostForm(fichierLink, url.Values{"adz": {adz}, "dl_no_ssl": {"on"}, "dlinline": {"on"}})
 	if err != nil {
 		return nil, err
 	}
@@ -73,4 +81,34 @@ func (ds DownloaderService) downloadFromFichier(fichierLink string, adz string) 
 		return nil, err
 	}
 	return res.Body, nil
+}
+
+func (ds *DownloaderService) getHttpClientWithProxy() *http.Client {
+	if len(ds.proxies) == 0 {
+		ds.proxies = getProxies()
+	}
+	proxy := ds.proxies[0]
+	ds.proxies = ds.proxies[1:]
+	proxyUrl, _ := url.Parse(proxy)
+	return &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+}
+
+func getProxies() []string {
+	resp, _ := http.Get(proxies_url)
+	presponse := proxyResponse{}
+	json.NewDecoder(resp.Body).Decode(&presponse)
+	result := make([]string, 0)
+	for _, proxy := range presponse.LISTA {
+		result = append(result, fmt.Sprintf("http://%s:%s", proxy.IP, proxy.PORT))
+	}
+	return result
+}
+
+type proxy struct {
+	IP   string
+	PORT string
+}
+
+type proxyResponse struct {
+	LISTA []proxy
 }

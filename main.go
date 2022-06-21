@@ -5,14 +5,10 @@ import (
 	"aeperez24/animewatcher/service"
 	"aeperez24/animewatcher/vendors/animeshow"
 	"aeperez24/animewatcher/vendors/cuevana"
-	"crypto/tls"
 	"log"
-	"net/http"
 )
 
 func main() {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-
 	appConfig, err := service.LoadConfig("./")
 
 	if err != nil {
