@@ -4,10 +4,14 @@ import (
 	"aeperez24/animewatcher/port"
 	"aeperez24/animewatcher/service"
 	"aeperez24/animewatcher/vendors/animeshow"
+	"aeperez24/animewatcher/vendors/cuevana"
+	"crypto/tls"
 	"log"
+	"net/http"
 )
 
 func main() {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	appConfig, err := service.LoadConfig("./")
 
@@ -25,9 +29,12 @@ func main() {
 		GetSender:        service.GetWrapper{},
 		AppConfiguration: appConfig,
 	}
+	dsCuevana := cuevana.DownloaderService{ScrapService: cuevana.ScrapperService{},
+		GetSender: service.GetWrapper{}}
 
 	servicesMap := map[string]port.GeneralDownloadService{}
 	servicesMap["animeshow"] = ds
+	servicesMap["cuevana"] = dsCuevana
 	downloaderManager := service.DownloaderManager{FileSystemManager: service.FileSystemManagerWrapper{},
 		AppConfiguration: appConfig, DownloaderServices: servicesMap, Tracker: service.TrackerServiceImpl{FileSystemManager: service.FileSystemManagerWrapper{}},
 	}

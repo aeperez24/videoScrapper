@@ -9,9 +9,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type ScrapperServiceImpl struct{}
+type ScrapperService struct{}
 
-func (ScrapperServiceImpl) getEpisodesList(data io.Reader) ([]string, error) {
+func (ScrapperService) getEpisodesList(data io.Reader) ([]string, error) {
 	doc, err := goquery.NewDocumentFromReader(data)
 	if err != nil {
 		return nil, err
@@ -25,13 +25,13 @@ func (ScrapperServiceImpl) getEpisodesList(data io.Reader) ([]string, error) {
 	return episodesArr, nil
 }
 
-func (ScrapperServiceImpl) getEpisodeName(link string) string {
+func (ScrapperService) getEpisodeName(link string) string {
 	episodeNumber := (strings.Split(link, "/episodio/"))[1]
 	episodeNumber = strings.ReplaceAll(episodeNumber, "/", "")
 	return episodeNumber
 }
 
-func (ScrapperServiceImpl) get1fichierLink(data io.Reader) (string, error) {
+func (ScrapperService) get1fichierLink(data io.Reader) (string, error) {
 	doc, err := goquery.NewDocumentFromReader(data)
 	if err != nil {
 		return "", err
@@ -49,4 +49,62 @@ func (ScrapperServiceImpl) get1fichierLink(data io.Reader) (string, error) {
 	}
 
 	return resultLink, err
+}
+
+func (service ScrapperService) getParammsForFichierDownload(data io.Reader) (fichierParams, error) {
+	doc, err := goquery.NewDocumentFromReader(data)
+	if err != nil {
+		return fichierParams{}, err
+	}
+
+	adz, err := service.getAdzFromFichier(doc)
+	if err != nil {
+		return fichierParams{}, err
+	}
+	postUrl, err := service.getPostUrlFromFichier(doc)
+	if err != nil {
+		return fichierParams{}, err
+	}
+
+	return fichierParams{adz, postUrl}, nil
+}
+
+func (ScrapperService) getAdzFromFichier(doc *goquery.Document) (string, error) {
+
+	selection := doc.Find(`[name="adz"]`).First()
+	result, exist := selection.Attr("value")
+	if !exist {
+		return "", errors.New("adz not found")
+	}
+	fmt.Println(exist)
+	return result, nil
+}
+
+func (ScrapperService) getPostUrlFromFichier(doc *goquery.Document) (string, error) {
+	selection := doc.Find(`[method="post"]`).First()
+	result, exist := selection.Attr("action")
+	if !exist {
+		return "", errors.New("url not found")
+	}
+	fmt.Println(exist)
+	return result, nil
+}
+
+type fichierParams struct {
+	adz     string
+	postUrl string
+}
+
+func (service ScrapperService) getDownloadLink(data io.Reader) (string, error) {
+	doc, err := goquery.NewDocumentFromReader(data)
+	if err != nil {
+		return "", err
+	}
+	selection := doc.Find(`[class="ok btn-general btn-orange"]`).First()
+	link, exist := selection.Attr("href")
+	if !exist {
+		return "", errors.New("downloadLink not found")
+	}
+
+	return link, nil
 }
