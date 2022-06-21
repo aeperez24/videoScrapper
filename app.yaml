@@ -1,8 +1,8 @@
 OutputPath: '/Users/andresperez/Documents/downloads'
 SerieConfigurations:
   - SerieLink: 'https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Season-2'
-      SerieName: 'risingShield'
-      Provider: 'animeshow'
+    SerieName: 'risingShield'
+    Provider: 'animeshow'
   - SerieLink: 'https://ww3.cuevana3.me/serie/servant'
     SerieName: 'servant'
     Provider: 'cuevana'
