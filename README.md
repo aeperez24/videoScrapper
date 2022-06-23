@@ -14,7 +14,7 @@ To be used is necessary to modify the app.yaml configuration file where you need
 
 ## What can we do next:
 
-The goal of this  project is to be able of managing differents provider to download. right now  animeshowtv is the only provider avaliable. but it is possible to add new providers by  just implementing  the  GeneralDownloadService, and registering them on the main.go 
+The goal of this  project is to be able of managing differents provider to download. right now  animeshowtv and cuevana are the only providers avaliable. but it is possible to add new providers by  just implementing  the  GeneralDownloadService, and registering them on the main.go 
 
 
 ## command to compile for arm
