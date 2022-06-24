@@ -25,8 +25,7 @@ func main() {
 		GetSender:        service.GetWrapper{},
 		AppConfiguration: appConfig,
 	}
-	dsCuevana := cuevana.DownloaderService{ScrapService: cuevana.ScrapperService{},
-		GetSender: service.GetWrapper{}}
+	dsCuevana := cuevana.NewDownloaderService(service.GetWrapper{})
 
 	servicesMap := map[string]port.GeneralDownloadService{}
 	servicesMap["animeshow"] = ds
