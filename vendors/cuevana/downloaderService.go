@@ -86,7 +86,7 @@ func (ds DownloaderService) downloadFromFichier(fichierLink string, adz string) 
 		return nil, err
 	}
 
-	res, err := ds.GetSender.Get(downloadLink)
+	res, err := cl.Get(downloadLink)
 	if err != nil {
 		return nil, err
 	}

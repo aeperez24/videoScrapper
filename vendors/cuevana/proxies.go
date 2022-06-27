@@ -3,6 +3,7 @@ package cuevana
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/url"
 )
@@ -12,8 +13,9 @@ func getHttpClientWithProxy(proxies *[]string) httpPostClient {
 	if len(*proxies) == 0 {
 		nproxies = getProxies()
 	}
-	proxy := (*proxies)[0]
-	nproxies = nproxies[1:]
+	randNumber := rand.Intn(len(nproxies))
+	proxy := (nproxies)[randNumber]
+	nproxies = removeElement(nproxies, randNumber)
 	proxies = &(nproxies)
 	proxyUrl, _ := url.Parse(proxy)
 	return &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
@@ -41,4 +43,10 @@ type proxyResponse struct {
 
 type httpPostClient interface {
 	PostForm(url string, data url.Values) (resp *http.Response, err error)
+	Get(url string) (*http.Response, error)
+}
+
+func removeElement(in []string, pos int) []string {
+	return append(in[0:pos], in[pos:]...)
+
 }
