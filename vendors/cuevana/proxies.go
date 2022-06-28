@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 func getHttpClientWithProxy(proxies *[]string) httpPostClient {
@@ -13,6 +14,7 @@ func getHttpClientWithProxy(proxies *[]string) httpPostClient {
 	if len(*proxies) == 0 {
 		nproxies = getProxies()
 	}
+	rand.Seed(time.Now().UnixNano())
 	randNumber := rand.Intn(len(nproxies))
 	proxy := (nproxies)[randNumber]
 	nproxies = removeElement(nproxies, randNumber)

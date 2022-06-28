@@ -16,13 +16,14 @@ func main() {
 		log.Fatal(err)
 		log.Panic(err)
 	}
-
-	logFile, err := os.OpenFile(appConfig.LogsPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		log.Panic(err)
+	if appConfig.LogsPath != "" {
+		logFile, err := os.OpenFile(appConfig.LogsPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+		if err != nil {
+			log.Panic(err)
+		}
+		log.SetOutput(logFile)
+		defer logFile.Close()
 	}
-	log.SetOutput(logFile)
-	defer logFile.Close()
 
 	chanArr := make([]chan []error, len(appConfig.SerieConfigurations))
 	for i, _ := range chanArr {
