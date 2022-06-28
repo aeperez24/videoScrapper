@@ -14,6 +14,7 @@ type SerieConfiguration struct {
 type AppConfiguration struct {
 	SerieConfigurations []SerieConfiguration
 	OutputPath          string
+	LogsPath            string
 }
 
 type DownloaderManager struct {
