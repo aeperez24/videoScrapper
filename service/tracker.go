@@ -22,7 +22,7 @@ func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(SerieName string
 	if byteArr == nil {
 		return false
 	}
-	log.Printf("serie %s episode(%s)", SerieName, episodeNumber)
+	log.Printf("serie %s episode(%s) already downloaded \n", SerieName, episodeNumber)
 	stringFile := fmt.Sprintf("%s", byteArr)
 	episodesNumber := strings.Split(stringFile, " ")
 	for _, ep := range episodesNumber {

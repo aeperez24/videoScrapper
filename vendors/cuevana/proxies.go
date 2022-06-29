@@ -9,18 +9,12 @@ import (
 	"time"
 )
 
-func getHttpClientWithProxy(proxies *[]string) httpPostClient {
-	nproxies := *proxies
-	if len(*proxies) == 0 {
-		nproxies = getProxies()
-	}
+func getHttpClientWithProxy(proxies []string) (httpPostClient, string) {
 	rand.Seed(time.Now().UnixNano())
-	randNumber := rand.Intn(len(nproxies))
-	proxy := (nproxies)[randNumber]
-	nproxies = removeElement(nproxies, randNumber)
-	proxies = &(nproxies)
+	randNumber := rand.Intn(len(proxies))
+	proxy := (proxies)[randNumber]
 	proxyUrl, _ := url.Parse(proxy)
-	return &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+	return &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}, proxy
 }
 
 func getProxies() []string {

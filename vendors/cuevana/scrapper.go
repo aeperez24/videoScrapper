@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -22,7 +21,6 @@ func (ScrapperService) getEpisodesList(data io.Reader) ([]string, error) {
 		val, _ := s.Attr("href")
 		episodesArr = append(episodesArr, val)
 	})
-	log.Default().Println(episodesArr)
 	return episodesArr, nil
 }
 
@@ -77,7 +75,6 @@ func (ScrapperService) getAdzFromFichier(doc *goquery.Document) (string, error) 
 	if !exist {
 		return "", errors.New("adz not found")
 	}
-	log.Default().Println(exist)
 	return result, nil
 }
 

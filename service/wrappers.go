@@ -32,7 +32,7 @@ func (wrapper FileSystemManagerWrapper) Save(filepath string, fileName string, r
 	}
 	defer out.Close()
 	io.Copy(out, reader)
-	log.Println("file saved on " + filepath)
+	log.Printf("file %v saved on %v", fileName, filepath)
 	return nil
 }
 

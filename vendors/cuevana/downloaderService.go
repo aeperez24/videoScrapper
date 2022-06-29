@@ -13,9 +13,9 @@ const proxies_url string = "https://www.proxy-list.download/api/v2/get?l=en&t=ht
 type DownloaderService struct {
 	ScrapService         ScrapperService
 	GetSender            service.GetSender
-	proxies              []string
 	getProxies           func() []string
-	getClientWithProxies func(*[]string) httpPostClient
+	getClientWithProxies func([]string) (httpPostClient, string)
+	usedProxies          map[string]bool
 }
 
 func NewDownloaderService(httpWraper service.GetSender) DownloaderService {
@@ -24,6 +24,7 @@ func NewDownloaderService(httpWraper service.GetSender) DownloaderService {
 		GetSender:            httpWraper,
 		getProxies:           getProxies,
 		getClientWithProxies: getHttpClientWithProxy,
+		usedProxies:          make(map[string]bool),
 	}
 
 }
@@ -75,7 +76,12 @@ func (ds DownloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 }
 
 func (ds DownloaderService) downloadFromFichier(fichierLink string, adz string) (io.Reader, error) {
-	cl := ds.getClientWithProxies(&ds.proxies)
+
+	proxies := getProxies()
+
+	filtered := ds.filterProxies(proxies)
+	cl, proxy := ds.getClientWithProxies(filtered)
+	ds.usedProxies[proxy] = true
 	resp, err := cl.PostForm(fichierLink, url.Values{"adz": {adz}, "dl_no_ssl": {"on"}, "dlinline": {"on"}})
 	if err != nil {
 		return nil, err
@@ -91,4 +97,15 @@ func (ds DownloaderService) downloadFromFichier(fichierLink string, adz string) 
 		return nil, err
 	}
 	return res.Body, nil
+
+}
+
+func (ds DownloaderService) filterProxies(proxies []string) []string {
+	filtered := make([]string, 0)
+	for _, proxy := range proxies {
+		if !ds.usedProxies[proxy] {
+			filtered = append(filtered, proxy)
+		}
+	}
+	return filtered
 }
