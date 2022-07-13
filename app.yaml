@@ -1,5 +1,4 @@
 OutputPath: '/Users/andresperez/Documents/downloads'
-LogsPath: '/Users/andresperez/Documents/logs'
 SerieConfigurations:
   - SerieLink: 'https://ww3.cuevana3.me/serie/servant'
     SerieName: 'servant'
