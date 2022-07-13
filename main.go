@@ -2,9 +2,9 @@ package main
 
 import (
 	"aeperez24/animewatcher/port"
+	"aeperez24/animewatcher/provider/animeshow"
+	"aeperez24/animewatcher/provider/cuevana"
 	"aeperez24/animewatcher/service"
-	"aeperez24/animewatcher/vendors/animeshow"
-	"aeperez24/animewatcher/vendors/cuevana"
 	"log"
 	"os"
 )

@@ -1,7 +1,6 @@
-package test
+package service
 
 import (
-	"aeperez24/animewatcher/service"
 	"io"
 	"strings"
 	"testing"
@@ -15,7 +14,7 @@ func TestShouldRetrunTrueWhenIsPreviouslyDownloaded(t *testing.T) {
 	fsMock := &FileSystemManagerMock{}
 	fsMock.On("Read", "tracking_files", "SerieName").Return(
 		[]byte("3 1 2"), nil)
-	trackerService := service.TrackerServiceImpl{FileSystemManager: fsMock}
+	trackerService := TrackerServiceImpl{FileSystemManager: fsMock}
 	assert.True(t, trackerService.IsPreviouslyDownloaded("SerieName", "3"))
 
 }
@@ -23,9 +22,9 @@ func TestShouldRetrunTrueWhenIsPreviouslyDownloaded(t *testing.T) {
 func TestShouldRetrunFalseWhenIsNotPreviouslyDownloaded(t *testing.T) {
 
 	fsMock := &FileSystemManagerMock{}
-	fsMock.On("Read", service.TRACKING_FILES_PATH, "SerieName").Return(
+	fsMock.On("Read", TRACKING_FILES_PATH, "SerieName").Return(
 		[]byte("1 2"), nil)
-	trackerService := service.TrackerServiceImpl{FileSystemManager: fsMock}
+	trackerService := TrackerServiceImpl{FileSystemManager: fsMock}
 	assert.False(t, trackerService.IsPreviouslyDownloaded("SerieName", "3"))
 
 }
@@ -33,13 +32,13 @@ func TestShouldRetrunFalseWhenIsNotPreviouslyDownloaded(t *testing.T) {
 func TestShouldSaveEpisode3OnTrackingFile(t *testing.T) {
 
 	fsMock := &FileSystemManagerMock{}
-	fsMock.On("Read", service.TRACKING_FILES_PATH, "SerieName").Return(
+	fsMock.On("Read", TRACKING_FILES_PATH, "SerieName").Return(
 		[]byte("1 2"), nil)
 	downloadedList := strings.NewReader("1 2 3")
-	fsMock.On("Save", service.TRACKING_FILES_PATH, "SerieName", downloadedList).Return(nil)
-	trackerService := service.TrackerServiceImpl{FileSystemManager: fsMock}
+	fsMock.On("Save", TRACKING_FILES_PATH, "SerieName", downloadedList).Return(nil)
+	trackerService := TrackerServiceImpl{FileSystemManager: fsMock}
 	trackerService.SaveAlreadyDownloaded("SerieName", "3")
-	fsMock.AssertCalled(t, "Save", service.TRACKING_FILES_PATH, "SerieName", downloadedList)
+	fsMock.AssertCalled(t, "Save", TRACKING_FILES_PATH, "SerieName", downloadedList)
 }
 
 type FileSystemManagerMock struct {

@@ -1,7 +1,6 @@
-package test
+package service
 
 import (
-	"aeperez24/animewatcher/service"
 	"log"
 	"testing"
 
@@ -9,11 +8,11 @@ import (
 )
 
 func TestGetConfig(t *testing.T) {
-	config, err := service.LoadConfig("inputs")
+	config, err := LoadConfig("inputs")
 	log.Println(err)
 	assert.Nil(t, err, "Error parsing")
-	SerieConfigurations := []service.SerieConfiguration{
+	SerieConfigurations := []SerieConfiguration{
 		{SerieLink: "link1", SerieName: "name1", Provider: "provider"}, {SerieLink: "link2", SerieName: "name2", Provider: "provider"}}
-	expected := service.AppConfiguration{SerieConfigurations: SerieConfigurations, OutputPath: "output"}
+	expected := AppConfiguration{SerieConfigurations: SerieConfigurations, OutputPath: "output"}
 	assert.Equal(t, expected, config, "config is not equals to expected")
 }
