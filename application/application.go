@@ -1,4 +1,4 @@
-package main
+package application
 
 import (
 	"aeperez24/animewatcher/port"
@@ -10,7 +10,7 @@ import (
 )
 
 type Application interface {
-	run()
+	Run()
 }
 
 type applicationImpl struct {
@@ -69,7 +69,7 @@ func initializeDownloadServices(appConfig service.AppConfiguration) map[string]p
 	return servicesMap
 }
 
-func (app applicationImpl) run() {
+func (app applicationImpl) Run() {
 	chanArr := make([]chan []error, len(app.configuration.SerieConfigurations))
 	for i, _ := range chanArr {
 		chanArr[i] = make(chan []error)

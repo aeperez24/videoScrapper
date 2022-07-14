@@ -1,5 +1,7 @@
 package main
 
+import "aeperez24/animewatcher/application"
+
 func main() {
-	NewApplication().run()
+	application.NewApplication().Run()
 }
