@@ -12,7 +12,7 @@ import (
 
 type DowloaderService struct {
 	ScrapService     ScrapperService
-	GetSender        service.GetSender
+	HttpWrapper      service.HttpWrapper
 	AppConfiguration service.AppConfiguration
 }
 
@@ -27,13 +27,13 @@ func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 	if err != nil {
 		return nil, "", err
 	}
-	episodePage, _ := dls.GetSender.Get(episodeLink)
+	episodePage, _ := dls.HttpWrapper.Get(episodeLink)
 	defer episodePage.Body.Close()
 	linkWithMirror, err := dls.ScrapService.GetLinkWithMirror(episodePage.Body)
 	if err != nil {
 		return nil, "", err
 	}
-	pageWithMirror, _ := dls.GetSender.Get(linkWithMirror)
+	pageWithMirror, _ := dls.HttpWrapper.Get(linkWithMirror)
 
 	downloadUrl, err := dls.ScrapService.GetMegauploadEpisodeLink(pageWithMirror.Body)
 	if err != nil {
@@ -55,7 +55,7 @@ func (ds DowloaderService) getLinkForEpisodeNumber(espisodeLinks []string, episo
 
 func (dls DowloaderService) getEpisodesAvaliable(serieLink string) ([]string, error) {
 
-	episodesPage, err := dls.GetSender.Get(serieLink)
+	episodesPage, err := dls.HttpWrapper.Get(serieLink)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader,
 		return nil, "", err
 	}
 	payload := fmt.Sprintf("op=download2&id=%s&method_free=+", code)
-	postResult, err := dls.GetSender.Request(downloadUrl, "POST", strings.NewReader(payload))
+	postResult, err := dls.HttpWrapper.Request(downloadUrl, "POST", strings.NewReader(payload))
 	if err != nil {
 		return nil, "", err
 	}
@@ -103,7 +103,7 @@ func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader,
 
 	log.Println("downloading from" + downloadLink)
 
-	episodeResp, err := dls.GetSender.RequestWithHeaders(downloadLink, "GET", nil, headers)
+	episodeResp, err := dls.HttpWrapper.RequestWithHeaders(downloadLink, "GET", nil, headers)
 	if err != nil {
 		return nil, "", err
 	}

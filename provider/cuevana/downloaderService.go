@@ -12,16 +12,16 @@ const proxies_url string = "https://www.proxy-list.download/api/v2/get?l=en&t=ht
 
 type DownloaderService struct {
 	ScrapService         ScrapperService
-	GetSender            service.GetSender
+	HttpWrapper          service.HttpWrapper
 	getProxies           func() []string
 	getClientWithProxies func([]string) (httpPostClient, string)
 	usedProxies          map[string]bool
 }
 
-func NewDownloaderService(httpWraper service.GetSender) DownloaderService {
+func NewDownloaderService(httpWraper service.HttpWrapper) DownloaderService {
 	return DownloaderService{
 		ScrapService:         ScrapperService{},
-		GetSender:            httpWraper,
+		HttpWrapper:          httpWraper,
 		getProxies:           getProxies,
 		getClientWithProxies: getHttpClientWithProxy,
 		usedProxies:          make(map[string]bool),
@@ -43,7 +43,7 @@ func (ds DownloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]stri
 }
 
 func (ds DownloaderService) GetSortedEpisodesLinks(serieLink string) ([]string, error) {
-	resp, err := ds.GetSender.Get(serieLink)
+	resp, err := ds.HttpWrapper.Get(serieLink)
 	if err != nil {
 		return nil, err
 	}
@@ -54,13 +54,13 @@ func (ds DownloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 	episodesLinks, _ := ds.GetSortedEpisodesLinks(serieLink)
 	for _, episodeLink := range episodesLinks {
 		if strings.Contains(episodeLink, episodeNumber) {
-			episodePage, err := ds.GetSender.Get(episodeLink)
+			episodePage, err := ds.HttpWrapper.Get(episodeLink)
 			if err != nil {
 				return nil, "", err
 			}
 			defer episodePage.Body.Close()
 			fichierLink, _ := ds.ScrapService.get1fichierLink(episodePage.Body)
-			fichierPage, _ := ds.GetSender.Get(fichierLink)
+			fichierPage, _ := ds.HttpWrapper.Get(fichierLink)
 			defer fichierPage.Body.Close()
 
 			params, err := ds.ScrapService.getParammsForFichierDownload(fichierPage.Body)
@@ -92,7 +92,7 @@ func (ds DownloaderService) downloadFromFichier(fichierLink string, adz string) 
 		return nil, err
 	}
 
-	res, err := ds.GetSender.Get(downloadLink)
+	res, err := ds.HttpWrapper.Get(downloadLink)
 	if err != nil {
 		return nil, err
 	}

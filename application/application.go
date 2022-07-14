@@ -58,11 +58,11 @@ func configureLogs(appConfig service.AppConfiguration) {
 func initializeDownloadServices(appConfig service.AppConfiguration) map[string]port.GeneralDownloadService {
 	dsAnimeshow := animeshow.DowloaderService{
 		ScrapService:     animeshow.ScrapperServiceImpl{},
-		GetSender:        service.GetWrapper{},
+		HttpWrapper:      service.HttpWrapperImpl{},
 		AppConfiguration: appConfig,
 	}
 
-	dsCuevana := cuevana.NewDownloaderService(service.GetWrapper{})
+	dsCuevana := cuevana.NewDownloaderService(service.HttpWrapperImpl{})
 	servicesMap := map[string]port.GeneralDownloadService{}
 	servicesMap["animeshow"] = dsAnimeshow
 	servicesMap["cuevana"] = dsCuevana
