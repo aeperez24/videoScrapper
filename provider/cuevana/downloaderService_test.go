@@ -2,7 +2,6 @@ package cuevana
 
 import (
 	"aeperez24/animewatcher/service"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -14,22 +13,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var testCuevanaService = DownloaderService{ScrapService: ScrapperService{}, HttpWrapper: buildHttpWrapperMock(),
+	getProxies: mockGetProxies, getClientWithProxies: mockGetClientWithProxy, usedProxies: make(map[string]bool)}
+
 func TestMustReturnSortedEpisodesLinks(t *testing.T) {
-	links, _ := testCuevanaService.GetSortedEpisodesLinks("serieLink")
+	links, _ := getTestCuevanaService().GetSortedEpisodesLinks("serieLink")
 	assert.Equal(t, 30, len(links))
 	assert.True(t, contains(links, "https://ww3.cuevana3.me/episodio/servant-1x1"))
 }
 
 func TestMustReturnEpisodesNames(t *testing.T) {
-	episodes, _ := testCuevanaService.GetSortedEpisodesAvaliable("serieLink")
+	episodes, _ := getTestCuevanaService().GetSortedEpisodesAvaliable("serieLink")
 	assert.Equal(t, 30, len(episodes))
-
-	fmt.Println(episodes)
 	assert.True(t, contains(episodes, "servant-1x1"))
 }
 
 func TestMustReturnDownloadEpisodeFromLink(t *testing.T) {
-	video, format, err := testCuevanaService.DownloadEpisodeFromLink("serieLink", "servant-1x1")
+	video, format, err := getTestCuevanaService().DownloadEpisodeFromLink("serieLink", "servant-1x1")
 	assert.Nil(t, err)
 	bytes, _ := ioutil.ReadAll(video)
 	assert.Equal(t, "video", string(bytes))
@@ -37,9 +37,10 @@ func TestMustReturnDownloadEpisodeFromLink(t *testing.T) {
 
 }
 
-var testCuevanaService = DownloaderService{ScrapService: ScrapperService{}, HttpWrapper: buildHttpWrapperMock(),
-	getProxies: mockGetProxies, getClientWithProxies: mockGetClientWithProxy, usedProxies: make(map[string]bool)}
-
+func getTestCuevanaService() DownloaderService {
+	return DownloaderService{ScrapService: ScrapperService{}, HttpWrapper: buildHttpWrapperMock(),
+		getProxies: mockGetProxies, getClientWithProxies: mockGetClientWithProxy, usedProxies: make(map[string]bool)}
+}
 func mockGetProxies() []string {
 	return []string{"proxy"}
 }
