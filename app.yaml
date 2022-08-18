@@ -1,8 +1,8 @@
-OutputPath: '/Users/andresperez/Documents/downloads'
+OutputPath: '/Users/path/downloads'
 SerieConfigurations:
-  - SerieLink: 'https://ww3.cuevana3.me/serie/servant'
-    SerieName: 'servant'
-    Provider: 'cuevana'
+  - SerieLink: 'serieLink'
+    SerieName: 'serieName'
+    Provider: 'cuevana|animeshow'
 
 
 
