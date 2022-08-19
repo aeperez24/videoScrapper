@@ -3,17 +3,16 @@
 VideoScrapper is a simple application to scrap and download series eposiodes from specific web pages.
 To be used it's necessary to modify the app.yaml configuration file where you need to specify the nexts fields:
 ## How to use:
-- OutputPath: This is the path where episodes will be stored  when the are downloaded.
+### app.yaml
+The app.yaml configuration file is composed by the next fields
+- OutputPath: This is the path where episodes will be stored  when the are downloaded. (only use this field if application is running outside docker)
 
-- SerieConfigurations: This field is meant to specify the list of series you want to track and download. it`s composed by:
+- SerieConfigurations: This field specify the list of series you want to track and download. it`s composed by:
   - SerieLink: the root link to scrap the tv serie.
   - SerieName: the name you want to use to store the episodes.
   - Provider:  the provider related to the SerieLink, right now only animeshowtv is allowed.
 
 
-## command to compile for arm
-
-env GOOS=linux GOARCH=arm GOARM=5 go build
 
 ## Running with docker
 - Compile the image
@@ -28,6 +27,10 @@ env GOOS=linux GOARCH=arm GOARM=5 go build
 
 ```docker run -it --rm -v "output_path:/output/" -v "/application_home:/home/" videoscrapper```
 
+
+## command to compile for arm
+
+env GOOS=linux GOARCH=arm GOARM=5 go build
 
 
 ## What can we do next:
