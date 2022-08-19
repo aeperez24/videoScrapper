@@ -1,7 +1,7 @@
 # videoScrapper
 
 VideoScrapper is a simple application to scrap and download series eposiodes from specific web pages.
-To be used is necessary to modify the app.yaml configuration file where you need to specify the nexts fields:
+To be used it's necessary to modify the app.yaml configuration file where you need to specify the nexts fields:
 ## How to use:
 - OutputPath: This is the path where episodes will be stored  when the are downloaded.
 
@@ -11,12 +11,25 @@ To be used is necessary to modify the app.yaml configuration file where you need
   - Provider:  the provider related to the SerieLink, right now only animeshowtv is allowed.
 
 
-
-## What can we do next:
-
-The goal of this  project is to be able of managing differents provider to download. right now  animeshowtv and cuevana are the only providers avaliable. but it is possible to add new providers by  just implementing  the  GeneralDownloadService, and registering them on the main.go 
-
-
 ## command to compile for arm
 
 env GOOS=linux GOARCH=arm GOARM=5 go build
+
+## Running with docker
+- Compile the image
+ 
+ ```docker build -t videoscrapper```
+
+- Create a new folder  to store the application data (application_home)
+- Add an app.yaml in the application_home and  set the SerieConfigurations.
+- Create a new folder for the application output (output_path).
+- Run the next docker command, replacing the output_path and application_home with the folder's path  created in previous steps:
+
+
+```docker run -it --rm -v "output_path:/output/" -v "/application_home:/home/" videoscrapper```
+
+
+
+## What can we do next:
+
+The main goal of this project is to be able to download videos from different sources. So far animeshowtv and cuevana are the only available providers. But it is possible to add new providers by simply implementing the GeneralDownloadService interface , and registering them in the initializeDownloadServices function. 

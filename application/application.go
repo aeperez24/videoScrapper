@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+const DEFAULT_OUTPUT = "/output/"
+
 type Application interface {
 	Run()
 }
@@ -21,6 +23,10 @@ type applicationImpl struct {
 
 func NewApplication() Application {
 	appConfig := loadConfiguration()
+	if appConfig.OutputPath == "" {
+		appConfig.OutputPath = DEFAULT_OUTPUT
+	}
+
 	configureLogs(appConfig)
 	servicesMap := initializeDownloadServices(appConfig)
 	downloaderManager := service.DownloaderManager{FileSystemManager: service.FileSystemManagerWrapper{},
@@ -71,7 +77,7 @@ func initializeDownloadServices(appConfig service.AppConfiguration) map[string]p
 
 func (app applicationImpl) Run() {
 	chanArr := make([]chan []error, len(app.configuration.SerieConfigurations))
-	for i, _ := range chanArr {
+	for i := range chanArr {
 		chanArr[i] = make(chan []error)
 	}
 	for i, config := range app.configuration.SerieConfigurations {

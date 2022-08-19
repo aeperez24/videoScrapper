@@ -1,4 +1,4 @@
-OutputPath: 'output'
+OutputPath: '/output/'
 SerieConfigurations:
   - SerieLink: 'link1'
     SerieName: 'name1'
