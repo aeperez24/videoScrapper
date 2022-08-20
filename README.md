@@ -17,7 +17,7 @@ The app.yaml configuration file is composed by the next fields
 ## Running with docker
 - Compile the image
  
- ```docker build -t videoscrapper```
+ ```docker build -t videoscrapper .```
 
 - Create a new folder  to store the application data (application_home)
 - Add an app.yaml in the application_home and  set the SerieConfigurations.

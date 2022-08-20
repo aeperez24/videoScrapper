@@ -6,7 +6,7 @@ RUN go build
 
 FROM  alpine:3.14
 COPY --from=build /videoscrapper/animewatcher ./
-WORKDIR home
+WORKDIR /home
 RUN mkdir /output/
 RUN mkdir traking_files/
 
