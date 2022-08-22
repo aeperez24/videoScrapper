@@ -13,6 +13,6 @@ func TestGetConfig(t *testing.T) {
 	assert.Nil(t, err, "Error parsing")
 	SerieConfigurations := []SerieConfiguration{
 		{SerieLink: "link1", SerieName: "name1", Provider: "provider"}, {SerieLink: "link2", SerieName: "name2", Provider: "provider"}}
-	expected := AppConfiguration{SerieConfigurations: SerieConfigurations, OutputPath: "output"}
+	expected := AppConfiguration{SerieConfigurations: SerieConfigurations, OutputPath: "/output/"}
 	assert.Equal(t, &expected, config, "config is not equals to expected")
 }
