@@ -18,7 +18,7 @@ func getHttpClientWithProxy(proxies []string) (httpPostClient, string) {
 }
 
 func getProxies() []string {
-	resp, _ := http.Get(proxies_url)
+	resp, _ := http.Get(proxiesUrl)
 	presponse := proxyResponse{}
 	json.NewDecoder(resp.Body).Decode(&presponse)
 	result := make([]string, 0)

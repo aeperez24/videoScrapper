@@ -59,7 +59,7 @@ func (ScrapperServiceImpl) GetMegauploadEpisodeLink(data io.Reader) (string, err
 func (ScrapperServiceImpl) GetMegauploadCode(uri string) (string, error) {
 	splitedUri := strings.Split(uri, "https://www.mp4upload.com/")
 	if len(splitedUri) != 2 {
-		return "", errors.New("error geting megaupload code ")
+		return "", errors.New("error geting megaupload code")
 	}
 	return strings.Replace(splitedUri[1], ".html", "", -1), nil
 }
