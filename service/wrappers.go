@@ -25,13 +25,21 @@ type FileSystemManager interface {
 }
 
 func (wrapper FileSystemManagerWrapper) Save(filepath string, fileName string, reader io.Reader) error {
-	os.MkdirAll(filepath, os.ModePerm)
+	err := os.MkdirAll(filepath, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
 	out, err := os.Create(filepath + "/" + fileName)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
-	io.Copy(out, reader)
+	_, err = io.Copy(out, reader)
+	if err != nil {
+		return err
+	}
+
 	log.Printf("file %v saved on %v", fileName, filepath)
 	return nil
 }
@@ -57,7 +65,11 @@ func (wrapper HttpWrapperImpl) Post(urlx string, contentType string, reader io.R
 }
 
 func (wrapper HttpWrapperImpl) Request(urlx string, method string, reader io.Reader) (*http.Response, error) {
-	req, _ := http.NewRequest(method, urlx, reader)
+	req, err := http.NewRequest(method, urlx, reader)
+	if err != nil {
+		return nil, err
+	}
+
 	cl := http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}}
@@ -65,13 +77,15 @@ func (wrapper HttpWrapperImpl) Request(urlx string, method string, reader io.Rea
 }
 
 func (wrapper HttpWrapperImpl) RequestWithHeaders(urlx string, method string, reader io.Reader, headers map[string]string) (*http.Response, error) {
-	req, _ := http.NewRequest(method, urlx, reader)
+	req, err := http.NewRequest(method, urlx, reader)
+	if err != nil {
+		return nil, err
+	}
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	cl := http.Client{
-		Transport: tr,
-	}
+	cl := http.Client{Transport: tr,}
 	for key, element := range headers {
 		req.Header.Add(key, element)
 	}

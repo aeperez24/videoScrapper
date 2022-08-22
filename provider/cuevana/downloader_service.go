@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const proxies_url string = "https://www.proxy-list.download/api/v2/get?l=en&t=https"
+const proxiesUrl string = "https://www.proxy-list.download/api/v2/get?l=en&t=https"
 
 type DownloaderService struct {
 	ScrapService         ScrapperService
@@ -58,6 +58,9 @@ func (ds DownloaderService) DownloadEpisodeFromLink(serieLink string, episodeNum
 			if err != nil {
 				return nil, "", err
 			}
+
+			// We should remove defer functions within loops
+			// https://stackoverflow.com/questions/45617758/proper-way-to-release-resources-with-defer-in-a-loop
 			defer episodePage.Body.Close()
 			fichierLink, _ := ds.ScrapService.get1fichierLink(episodePage.Body)
 			fichierPage, _ := ds.HttpWrapper.Get(fichierLink)

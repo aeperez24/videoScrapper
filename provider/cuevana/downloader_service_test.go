@@ -13,9 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testCuevanaService = DownloaderService{ScrapService: ScrapperService{}, HttpWrapper: buildHttpWrapperMock(),
-	getProxies: mockGetProxies, getClientWithProxies: mockGetClientWithProxy, usedProxies: make(map[string]bool)}
-
 func TestMustReturnSortedEpisodesLinks(t *testing.T) {
 	links, _ := getTestCuevanaService().GetSortedEpisodesLinks("serieLink")
 	assert.Equal(t, 30, len(links))
@@ -75,7 +72,7 @@ func buildHttpWrapperMock() service.HttpWrapper {
 			Body: io.NopCloser(strings.NewReader("video")),
 		}, nil)
 
-	return httpWrapper
+	return &httpWrapper
 }
 
 func open(filepath string) *os.File {

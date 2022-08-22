@@ -16,31 +16,37 @@ type DowloaderService struct {
 	AppConfiguration service.AppConfiguration
 }
 
-func (dls DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, string, error) {
-	episodes, err := dls.getEpisodesAvaliable(serieLink)
+func (ds DowloaderService) DownloadEpisodeFromLink(serieLink string, episodeNumber string) (io.Reader, string, error) {
+	episodes, err := ds.getEpisodesAvaliable(serieLink)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	episodeLink, err := dls.getLinkForEpisodeNumber(episodes, episodeNumber)
+	episodeLink, err := ds.getLinkForEpisodeNumber(episodes, episodeNumber)
 	if err != nil {
 		return nil, "", err
 	}
-	episodePage, _ := dls.HttpWrapper.Get(episodeLink)
+	episodePage, err := ds.HttpWrapper.Get(episodeLink)
+	if err != nil {
+		return nil, "", err
+	}
 	defer episodePage.Body.Close()
-	linkWithMirror, err := dls.ScrapService.GetLinkWithMirror(episodePage.Body)
+	linkWithMirror, err := ds.ScrapService.GetLinkWithMirror(episodePage.Body)
 	if err != nil {
 		return nil, "", err
 	}
-	pageWithMirror, _ := dls.HttpWrapper.Get(linkWithMirror)
+	pageWithMirror, err := ds.HttpWrapper.Get(linkWithMirror)
+	if err != nil {
+		return nil, "", err
+	}
 
-	downloadUrl, err := dls.ScrapService.GetMegauploadEpisodeLink(pageWithMirror.Body)
+	downloadUrl, err := ds.ScrapService.GetMegauploadEpisodeLink(pageWithMirror.Body)
 	if err != nil {
 		return nil, "", err
 	}
 	log.Println("url is " + downloadUrl)
-	return dls.downloadFromM4upload(downloadUrl)
+	return ds.downloadFromM4upload(downloadUrl)
 
 }
 
@@ -53,15 +59,15 @@ func (ds DowloaderService) getLinkForEpisodeNumber(espisodeLinks []string, episo
 	return "", errors.New("episode number download link not found")
 }
 
-func (dls DowloaderService) getEpisodesAvaliable(serieLink string) ([]string, error) {
+func (ds DowloaderService) getEpisodesAvaliable(serieLink string) ([]string, error) {
 
-	episodesPage, err := dls.HttpWrapper.Get(serieLink)
+	episodesPage, err := ds.HttpWrapper.Get(serieLink)
 	if err != nil {
 		return nil, err
 	}
 	defer episodesPage.Body.Close()
 
-	episodes, err := dls.ScrapService.GetEpisodesList(episodesPage.Body)
+	episodes, err := ds.ScrapService.GetEpisodesList(episodesPage.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +75,9 @@ func (dls DowloaderService) getEpisodesAvaliable(serieLink string) ([]string, er
 	return episodes, nil
 }
 
-func (dls DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]string, error) {
+func (ds DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]string, error) {
 
-	episdesLinks, err := dls.getEpisodesAvaliable(serieLink)
+	episdesLinks, err := ds.getEpisodesAvaliable(serieLink)
 	if err != nil {
 		return nil, err
 	}
@@ -79,19 +85,19 @@ func (dls DowloaderService) GetSortedEpisodesAvaliable(serieLink string) ([]stri
 
 	for _, episodeLink := range episdesLinks {
 
-		result = append(result, dls.ScrapService.GetEpisodeNumber(episodeLink))
+		result = append(result, ds.ScrapService.GetEpisodeNumber(episodeLink))
 	}
 	sort.Strings(result)
 	return result, nil
 }
 
-func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader, string, error) {
-	code, err := dls.ScrapService.GetMegauploadCode(downloadUrl)
+func (ds DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader, string, error) {
+	code, err := ds.ScrapService.GetMegauploadCode(downloadUrl)
 	if err != nil {
 		return nil, "", err
 	}
 	payload := fmt.Sprintf("op=download2&id=%s&method_free=+", code)
-	postResult, err := dls.HttpWrapper.Request(downloadUrl, "POST", strings.NewReader(payload))
+	postResult, err := ds.HttpWrapper.Request(downloadUrl, "POST", strings.NewReader(payload))
 	if err != nil {
 		return nil, "", err
 	}
@@ -103,7 +109,7 @@ func (dls DowloaderService) downloadFromM4upload(downloadUrl string) (io.Reader,
 
 	log.Println("downloading from" + downloadLink)
 
-	episodeResp, err := dls.HttpWrapper.RequestWithHeaders(downloadLink, "GET", nil, headers)
+	episodeResp, err := ds.HttpWrapper.RequestWithHeaders(downloadLink, "GET", nil, headers)
 	if err != nil {
 		return nil, "", err
 	}

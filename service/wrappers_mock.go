@@ -12,27 +12,27 @@ type HttpWrapperMock struct {
 	mock.Mock
 }
 
-func (wrapper HttpWrapperMock) Get(url string) (*http.Response, error) {
+func (wrapper *HttpWrapperMock) Get(url string) (*http.Response, error) {
 	args := wrapper.Called(url)
 	return buildResponse(args)
 }
 
-func (wrapper HttpWrapperMock) PostForm(url string, formValues url.Values) (*http.Response, error) {
+func (wrapper *HttpWrapperMock) PostForm(url string, formValues url.Values) (*http.Response, error) {
 	args := wrapper.Called(url, formValues)
 	return buildResponse(args)
 }
 
-func (wrapper HttpWrapperMock) Post(url string, contentType string, reader io.Reader) (*http.Response, error) {
+func (wrapper *HttpWrapperMock) Post(url string, contentType string, reader io.Reader) (*http.Response, error) {
 	args := wrapper.Called(url, contentType, reader)
 	return buildResponse(args)
 }
 
-func (wrapper HttpWrapperMock) Request(url string, method string, reader io.Reader) (*http.Response, error) {
+func (wrapper *HttpWrapperMock) Request(url string, method string, reader io.Reader) (*http.Response, error) {
 	args := wrapper.Called(url, method, reader)
 	return buildResponse(args)
 }
 
-func (wrapper HttpWrapperMock) RequestWithHeaders(url string, method string, reader io.Reader, headers map[string]string) (*http.Response, error) {
+func (wrapper *HttpWrapperMock) RequestWithHeaders(url string, method string, reader io.Reader, headers map[string]string) (*http.Response, error) {
 	args := wrapper.Called(url, method, reader, headers)
 	return buildResponse(args)
 }
