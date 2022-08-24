@@ -15,17 +15,12 @@ The app.yaml configuration file is composed by the next fields
 
 
 ## Running with docker
-- Compile the image
- 
- ```docker build -t videoscrapper .```
-
 - Create a new folder  to store the application data (application_home)
 - Add an app.yaml in the application_home and  set the SerieConfigurations.
-- Create a new folder for the application output (output_path).
-- Run the next docker command, replacing the output_path and application_home with the folder's path  created in previous steps:
-
-
-```docker run -it --rm -v "output_path:/output/" -v "/application_home:/home/" videoscrapper```
+- Create a new folder for the application output (output_path). 
+- Edit  the docker.env file setting the previously created folders as DOCKER_OUTPUT_PATH and DOCKER_APPLICATION_HOME
+- execute the next command:
+```make runDocker```
 
 
 ## command to compile for arm
