@@ -1,6 +1,7 @@
 package cuevana
 
 import (
+	serviceMock "aeperez24/animewatcher/mock/service"
 	"aeperez24/animewatcher/service"
 	"io"
 	"io/ioutil"
@@ -47,7 +48,7 @@ func mockGetClientWithProxy(in []string) (httpPostClient, string) {
 }
 
 func buildHttpWrapperMock() service.HttpWrapper {
-	httpWrapper := service.HttpWrapperMock{}
+	httpWrapper := serviceMock.HttpWrapper{}
 
 	httpWrapper.On("Get", "serieLink").Return(&http.Response{
 		Body: open("inputs/seriepage.html"),
