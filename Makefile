@@ -21,6 +21,7 @@ coverageHtml: coverage
 generateMocks:
 	mockery --dir=provider/animeshow  --all  --output=mock/animeshow/  --outpkg=animeshow
 	mockery --dir=service  --all  --output=mock/service/  --outpkg=service
+	mockery --dir=port  --all  --output=mock/port/  --outpkg=port
 
 
 
