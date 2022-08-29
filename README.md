@@ -7,13 +7,13 @@ To be used it's necessary to modify the app.yaml configuration file where you ne
 The app.yaml configuration file is composed by the next fields
 - OutputPath: This is the path where episodes will be stored  when the are downloaded. (only use this field if application is running outside docker).
 
-See the app.yaml.example 
-
 - SerieConfigurations: This field specify the list of series you want to track and download. it`s composed by:
   - SerieLink: the root link to scrap the tv serie.
   - SerieName: the name you want to use to store the episodes.
   - Provider:  the provider related to the SerieLink, right now only animeshowtv is allowed.
 
+
+See the app.yaml.example 
 
 ## Running with docker
 - Create a new folder  to store the application data (application_home)
