@@ -51,6 +51,7 @@ func TestDownloadAlltEpisodes(t *testing.T) {
 	assert.Empty(t, buildDownloadManager().DownloadAllEpisodes(serie_link))
 }
 
+//testTarget
 func buildDownloadManager() DownloaderManager {
 	fileSystemMock := getFileSystemManagerMock()
 	trackerMock := getTrackerMock()
@@ -63,15 +64,11 @@ func buildDownloadManager() DownloaderManager {
 	}
 }
 
-func getAppConfiguration() AppConfiguration {
-	return AppConfiguration{
-		OutputPath:          output_path,
-		SerieConfigurations: []SerieConfiguration{getSerieConfiguration()},
-	}
-}
-
-func getSerieConfiguration() SerieConfiguration {
-	return SerieConfiguration{SerieLink: serie_link, SerieName: serie_name, Provider: provider}
+//mocks building
+func getFileSystemManagerMock() serviceMock.FileSystemManager {
+	fileSystemMock := serviceMock.FileSystemManager{}
+	fileSystemMock.On("Save", output_path+"/"+serie_name, episode_number+"."+file_format, io.NopCloser(strings.NewReader(file_data))).Return(nil)
+	return fileSystemMock
 }
 
 func getTrackerMock() serviceMock.TrackerService {
@@ -91,8 +88,13 @@ func getGeneralDownloaderMock() portMock.GeneralDownloadService {
 	return generalDonwloaderServiceMock
 }
 
-func getFileSystemManagerMock() serviceMock.FileSystemManager {
-	fileSystemMock := serviceMock.FileSystemManager{}
-	fileSystemMock.On("Save", output_path+"/"+serie_name, episode_number+"."+file_format, io.NopCloser(strings.NewReader(file_data))).Return(nil)
-	return fileSystemMock
+func getAppConfiguration() AppConfiguration {
+	return AppConfiguration{
+		OutputPath:          output_path,
+		SerieConfigurations: []SerieConfiguration{getSerieConfiguration()},
+	}
+}
+
+func getSerieConfiguration() SerieConfiguration {
+	return SerieConfiguration{SerieLink: serie_link, SerieName: serie_name, Provider: provider}
 }
