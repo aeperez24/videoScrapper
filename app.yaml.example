@@ -1,0 +1,7 @@
+SerieConfigurations:
+  - SerieLink: 'https://ww3.cuevana3.me/serie/servant'
+    SerieName: 'servant'
+    Provider: 'cuevana'
+  - SerieLink: 'https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Season-2'
+    SerieName: 'risingShield'
+    Provider: 'animeshow'
