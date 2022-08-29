@@ -1,7 +1,7 @@
 package animeshow
 
 import (
-	"aeperez24/animewatcher/service"
+	"aeperez24/videoScrapper/service"
 	"errors"
 	"fmt"
 	"io"

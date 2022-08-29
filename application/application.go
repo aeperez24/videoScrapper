@@ -1,10 +1,10 @@
 package application
 
 import (
-	"aeperez24/animewatcher/port"
-	"aeperez24/animewatcher/provider/animeshow"
-	"aeperez24/animewatcher/provider/cuevana"
-	"aeperez24/animewatcher/service"
+	"aeperez24/videoScrapper/port"
+	"aeperez24/videoScrapper/provider/animeshow"
+	"aeperez24/videoScrapper/provider/cuevana"
+	"aeperez24/videoScrapper/service"
 	"log"
 	"os"
 )

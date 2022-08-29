@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	serviceMock "aeperez24/animewatcher/mock/service"
+	serviceMock "aeperez24/videoScrapper/mock/service"
 
 	"github.com/stretchr/testify/assert"
 )

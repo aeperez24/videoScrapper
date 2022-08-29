@@ -1,4 +1,4 @@
-module aeperez24/animewatcher
+module aeperez24/videoScrapper
 
 go 1.17
 

@@ -5,10 +5,10 @@ COPY .  /videoscrapper/
 RUN go build
 
 FROM  alpine:3.14
-COPY --from=build /videoscrapper/animewatcher ./
+COPY --from=build /videoscrapper/videoScrapper ./
 WORKDIR /home
 RUN mkdir /output/
 RUN mkdir traking_files/
 
-ENTRYPOINT [ "/animewatcher" ]
+ENTRYPOINT [ "/videoScrapper" ]
 

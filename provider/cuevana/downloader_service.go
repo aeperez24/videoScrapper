@@ -1,7 +1,7 @@
 package cuevana
 
 import (
-	"aeperez24/animewatcher/service"
+	"aeperez24/videoScrapper/service"
 	"fmt"
 	"io"
 	"net/url"

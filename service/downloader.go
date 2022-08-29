@@ -1,7 +1,7 @@
 package service
 
 import (
-	"aeperez24/animewatcher/port"
+	"aeperez24/videoScrapper/port"
 	"errors"
 	"fmt"
 )

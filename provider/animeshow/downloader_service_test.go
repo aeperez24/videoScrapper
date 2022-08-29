@@ -1,8 +1,8 @@
 package animeshow
 
 import (
-	serviceMock "aeperez24/animewatcher/mock/service"
-	"aeperez24/animewatcher/service"
+	serviceMock "aeperez24/videoScrapper/mock/service"
+	"aeperez24/videoScrapper/service"
 	"io"
 	"io/ioutil"
 	"net/http"

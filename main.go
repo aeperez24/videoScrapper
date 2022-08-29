@@ -1,6 +1,6 @@
 package main
 
-import "aeperez24/animewatcher/application"
+import "aeperez24/videoScrapper/application"
 
 func main() {
 	application.NewApplication().Run()
