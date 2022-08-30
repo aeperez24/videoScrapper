@@ -23,6 +23,9 @@ generateMocks:
 	mockery --dir=service  --all  --output=mock/service/  --outpkg=service
 	mockery --dir=port  --all  --output=mock/port/  --outpkg=port
 
+get-mockery:
+	go install github.com/vektra/mockery/v2@latest
+
 
 
 
