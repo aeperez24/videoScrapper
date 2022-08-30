@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const TRACKING_FILES_PATH = "tracking_files"
+const trackingFilesPath = "tracking_files"
 
 type TrackerService interface {
 	IsPreviouslyDownloaded(SerieLink string, episodelink string) bool
@@ -18,7 +18,7 @@ type TrackerServiceImpl struct {
 }
 
 func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(SerieName string, episodeNumber string) bool {
-	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, SerieName)
+	byteArr, _ := trackerService.FileSystemManager.Read(trackingFilesPath, SerieName)
 	if byteArr == nil {
 		return false
 	}
@@ -34,7 +34,7 @@ func (trackerService TrackerServiceImpl) IsPreviouslyDownloaded(SerieName string
 }
 
 func (trackerService TrackerServiceImpl) SaveAlreadyDownloaded(SerieName string, episodeNumber string) {
-	byteArr, _ := trackerService.FileSystemManager.Read(TRACKING_FILES_PATH, SerieName)
+	byteArr, _ := trackerService.FileSystemManager.Read(trackingFilesPath, SerieName)
 	if byteArr == nil {
 		byteArr = []byte("")
 	}
@@ -42,7 +42,7 @@ func (trackerService TrackerServiceImpl) SaveAlreadyDownloaded(SerieName string,
 
 	stringFile = stringFile + " " + strings.TrimSpace(episodeNumber)
 	reader := strings.NewReader(stringFile)
-	err := trackerService.FileSystemManager.Save(TRACKING_FILES_PATH, SerieName, reader)
+	err := trackerService.FileSystemManager.Save(trackingFilesPath, SerieName, reader)
 	if err != nil {
 		fmt.Println("error saving download track")
 		fmt.Println(err)

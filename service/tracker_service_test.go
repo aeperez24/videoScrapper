@@ -22,7 +22,7 @@ func TestShouldRetrunTrueWhenIsPreviouslyDownloaded(t *testing.T) {
 func TestShouldRetrunFalseWhenIsNotPreviouslyDownloaded(t *testing.T) {
 
 	fsMock := &serviceMock.FileSystemManager{}
-	fsMock.On("Read", TRACKING_FILES_PATH, "SerieName").Return(
+	fsMock.On("Read", trackingFilesPath, "SerieName").Return(
 		[]byte("1 2"), nil)
 	trackerService := TrackerServiceImpl{FileSystemManager: fsMock}
 	assert.False(t, trackerService.IsPreviouslyDownloaded("SerieName", "3"))
@@ -32,11 +32,11 @@ func TestShouldRetrunFalseWhenIsNotPreviouslyDownloaded(t *testing.T) {
 func TestShouldSaveEpisode3OnTrackingFile(t *testing.T) {
 
 	fsMock := &serviceMock.FileSystemManager{}
-	fsMock.On("Read", TRACKING_FILES_PATH, "SerieName").Return(
+	fsMock.On("Read", trackingFilesPath, "SerieName").Return(
 		[]byte("1 2"), nil)
 	downloadedList := strings.NewReader("1 2 3")
-	fsMock.On("Save", TRACKING_FILES_PATH, "SerieName", downloadedList).Return(nil)
+	fsMock.On("Save", trackingFilesPath, "SerieName", downloadedList).Return(nil)
 	trackerService := TrackerServiceImpl{FileSystemManager: fsMock}
 	trackerService.SaveAlreadyDownloaded("SerieName", "3")
-	fsMock.AssertCalled(t, "Save", TRACKING_FILES_PATH, "SerieName", downloadedList)
+	fsMock.AssertCalled(t, "Save", trackingFilesPath, "SerieName", downloadedList)
 }
