@@ -1,5 +1,5 @@
 include docker.env
-test: generateMocks
+test:
 	go test ./... 
 
 build: test
