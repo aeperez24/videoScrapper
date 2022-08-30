@@ -26,7 +26,7 @@ const MIRROR_LINK = "https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Seaso
 func TestGetEpisodesAvaliable(t *testing.T) {
 	ds := DowloaderService{
 		ScrapService:     ScrapperServiceImpl{},
-		HttpWrapper:      buildHttpWrapperMock(),
+		HttpWrapper:      buildHttpWrapperMock(t),
 		AppConfiguration: service.AppConfiguration{},
 	}
 	episodesList, _ := ds.getEpisodesAvaliable(SERIE_LINK)
@@ -38,7 +38,7 @@ func TestGetEpisodesAvaliable(t *testing.T) {
 func TestGetSortedEpisodesAvaliable(t *testing.T) {
 	ds := DowloaderService{
 		ScrapService:     ScrapperServiceImpl{},
-		HttpWrapper:      buildHttpWrapperMock(),
+		HttpWrapper:      buildHttpWrapperMock(t),
 		AppConfiguration: service.AppConfiguration{},
 	}
 	episodesList, _ := ds.GetSortedEpisodesAvaliable(SERIE_LINK)
@@ -49,19 +49,21 @@ func TestGetSortedEpisodesAvaliable(t *testing.T) {
 func TestDownloadFromM4upload(t *testing.T) {
 	ds := DowloaderService{
 		ScrapService:     ScrapperServiceImpl{},
-		HttpWrapper:      buildHttpWrapperMock(),
+		HttpWrapper:      buildHttpWrapperMock(t),
 		AppConfiguration: service.AppConfiguration{},
 	}
 
-	reader, _, _ := ds.downloadFromM4upload(DOWNLOAD_URL)
-	result, _ := ioutil.ReadAll(reader)
+	reader, _, err := ds.downloadFromM4upload(DOWNLOAD_URL)
+	assert.NoError(t, err)
+	result, err := ioutil.ReadAll(reader)
+	assert.NoError(t, err)
 	assert.Equal(t, VIDEO_DOWNLOAD, string(result))
 }
 
 func TestDownloadFromLink(t *testing.T) {
 	ds := DowloaderService{
 		ScrapService:     ScrapperServiceImpl{},
-		HttpWrapper:      buildHttpWrapperMock(),
+		HttpWrapper:      buildHttpWrapperMock(t),
 		AppConfiguration: service.AppConfiguration{},
 	}
 	reader, _, _ := ds.DownloadEpisodeFromLink(SERIE_LINK, "1")
@@ -69,18 +71,18 @@ func TestDownloadFromLink(t *testing.T) {
 	assert.Equal(t, VIDEO_DOWNLOAD, string(result))
 }
 
-func buildHttpWrapperMock() service.HttpWrapper {
+func buildHttpWrapperMock(t *testing.T) service.HttpWrapper {
 	httpWrapper := serviceMock.HttpWrapper{}
 	httpWrapper.On("Get", SERIE_LINK).Return(&http.Response{
-		Body: open("inputs/episodesList.html"),
+		Body: open(t, "inputs/episodesList.html"),
 	}, nil)
 
 	httpWrapper.On("Get", EPISODE_LINK).Return(&http.Response{
-		Body: open("inputs/episode.html"),
+		Body: open(t, "inputs/episode.html"),
 	}, nil)
 
 	httpWrapper.On("Get", MIRROR_LINK).Return(&http.Response{
-		Body: open("inputs/episodeMU.html"),
+		Body: open(t, "inputs/episodeMu.html"),
 	}, nil)
 
 	headersLocation := http.Header{}
@@ -99,7 +101,8 @@ func buildHttpWrapperMock() service.HttpWrapper {
 	return &httpWrapper
 }
 
-func open(filepath string) *os.File {
-	res, _ := os.Open(filepath)
+func open(t *testing.T, filepath string) *os.File {
+	res, err := os.Open(filepath)
+	assert.NoError(t, err, "error while reading file %s", filepath)
 	return res
 }
