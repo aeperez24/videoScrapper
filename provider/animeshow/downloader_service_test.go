@@ -15,13 +15,14 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-const EPISODE_LINK = "https://www2.animeshow.tv/Fullmetal-Alchemist-Brotherhood-episode-1/"
-const SERIE_LINK = "https://www2.animeshow.tv/Fullmetal-Alchemist-Brotherhood/"
-
-const DOWNLOAD_URL = "https://www.mp4upload.com/a6xkfdysqdbu"
-const LOCATION_URL = "location"
-const VIDEO_DOWNLOAD = "videoDownload"
-const MIRROR_LINK = "https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Season-2-episode-2-mirror-3/"
+const (
+	episodeLink   = "https://www2.animeshow.tv/Fullmetal-Alchemist-Brotherhood-episode-1/"
+	serieLink     = "https://www2.animeshow.tv/Fullmetal-Alchemist-Brotherhood/"
+	downloadUrl   = "https://www.mp4upload.com/a6xkfdysqdbu"
+	locationUrl   = "location"
+	videoDownload = "videoDownload"
+	mirrorLink    = "https://www2.animeshow.tv/Tate-no-Yuusha-no-Nariagari-Season-2-episode-2-mirror-3/"
+)
 
 func TestGetEpisodesAvaliable(t *testing.T) {
 	ds := DowloaderService{
@@ -29,7 +30,7 @@ func TestGetEpisodesAvaliable(t *testing.T) {
 		HttpWrapper:      buildHttpWrapperMock(t),
 		AppConfiguration: service.AppConfiguration{},
 	}
-	episodesList, _ := ds.getEpisodesAvaliable(SERIE_LINK)
+	episodesList, _ := ds.getEpisodesAvaliable(serieLink)
 	assert.Len(t, episodesList, 64, "the size expected is 64")
 	assert.Equal(t, "https://www2.animeshow.tv/Fullmetal-Alchemist-Brotherhood-episode-1/", episodesList[0], "")
 
@@ -41,7 +42,7 @@ func TestGetSortedEpisodesAvaliable(t *testing.T) {
 		HttpWrapper:      buildHttpWrapperMock(t),
 		AppConfiguration: service.AppConfiguration{},
 	}
-	episodesList, _ := ds.GetSortedEpisodesAvaliable(SERIE_LINK)
+	episodesList, _ := ds.GetSortedEpisodesAvaliable(serieLink)
 	assert.Len(t, episodesList, 64, "the size expected is 64")
 	assert.Equal(t, "1", episodesList[0], "")
 }
@@ -53,11 +54,11 @@ func TestDownloadFromM4upload(t *testing.T) {
 		AppConfiguration: service.AppConfiguration{},
 	}
 
-	reader, _, err := ds.downloadFromM4upload(DOWNLOAD_URL)
+	reader, _, err := ds.downloadFromM4upload(downloadUrl)
 	assert.NoError(t, err)
 	result, err := ioutil.ReadAll(reader)
 	assert.NoError(t, err)
-	assert.Equal(t, VIDEO_DOWNLOAD, string(result))
+	assert.Equal(t, videoDownload, string(result))
 }
 
 func TestDownloadFromLink(t *testing.T) {
@@ -66,36 +67,36 @@ func TestDownloadFromLink(t *testing.T) {
 		HttpWrapper:      buildHttpWrapperMock(t),
 		AppConfiguration: service.AppConfiguration{},
 	}
-	reader, _, _ := ds.DownloadEpisodeFromLink(SERIE_LINK, "1")
+	reader, _, _ := ds.DownloadEpisodeFromLink(serieLink, "1")
 	result, _ := ioutil.ReadAll(reader)
-	assert.Equal(t, VIDEO_DOWNLOAD, string(result))
+	assert.Equal(t, videoDownload, string(result))
 }
 
 func buildHttpWrapperMock(t *testing.T) service.HttpWrapper {
 	httpWrapper := serviceMock.HttpWrapper{}
-	httpWrapper.On("Get", SERIE_LINK).Return(&http.Response{
+	httpWrapper.On("Get", serieLink).Return(&http.Response{
 		Body: open(t, "inputs/episodesList.html"),
 	}, nil)
 
-	httpWrapper.On("Get", EPISODE_LINK).Return(&http.Response{
+	httpWrapper.On("Get", episodeLink).Return(&http.Response{
 		Body: open(t, "inputs/episode.html"),
 	}, nil)
 
-	httpWrapper.On("Get", MIRROR_LINK).Return(&http.Response{
+	httpWrapper.On("Get", mirrorLink).Return(&http.Response{
 		Body: open(t, "inputs/episodeMu.html"),
 	}, nil)
 
 	headersLocation := http.Header{}
-	headersLocation["Location"] = []string{LOCATION_URL}
-	httpWrapper.On("Request", DOWNLOAD_URL, "POST", mock.Anything).Return(&http.Response{
+	headersLocation["Location"] = []string{locationUrl}
+	httpWrapper.On("Request", downloadUrl, "POST", mock.Anything).Return(&http.Response{
 		Header: headersLocation,
 		Body:   io.NopCloser(strings.NewReader("")),
 	}, nil)
 
 	headersRefer := make(map[string]string)
 	headersRefer["Referer"] = "https://www.mp4upload.com/"
-	httpWrapper.On("RequestWithHeaders", LOCATION_URL, "GET", nil, headersRefer).Return(&http.Response{
-		Body: io.NopCloser(strings.NewReader(VIDEO_DOWNLOAD)),
+	httpWrapper.On("RequestWithHeaders", locationUrl, "GET", nil, headersRefer).Return(&http.Response{
+		Body: io.NopCloser(strings.NewReader(videoDownload)),
 	}, nil)
 
 	return &httpWrapper

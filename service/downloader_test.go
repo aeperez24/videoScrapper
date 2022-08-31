@@ -12,16 +12,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const serie_link = "serieLink"
-const serie_name = "serieName"
-const output_path = "output"
-const episode_number = "1"
-const file_data = "videoData"
-const file_format = "format"
-const provider = "provider"
+const (
+	serieLink     = "serieLink"
+	serieName     = "serieName"
+	outputPath    = "output"
+	episodeNumber = "1"
+	fileData      = "videoData"
+	fileFormat    = "format"
+	provider      = "provider"
+)
 
 func TestGetSerieNameFromLink(t *testing.T) {
-	assert.Equal(t, serie_name, buildDownloadManager().getSerieNameFromLink(serie_link))
+	assert.Equal(t, serieName, buildDownloadManager().getSerieNameFromLink(serieLink))
 }
 func TestReturnEmptyStringWhenSerieNameFromLinkIsNotFoundInConfigs(t *testing.T) {
 
@@ -29,7 +31,7 @@ func TestReturnEmptyStringWhenSerieNameFromLinkIsNotFoundInConfigs(t *testing.T)
 }
 
 func TestGetConfigFromLink(t *testing.T) {
-	config, err := buildDownloadManager().getConfigFromLink(serie_link)
+	config, err := buildDownloadManager().getConfigFromLink(serieLink)
 	assert.Nil(t, err)
 	assert.Equal(t, getSerieConfiguration(), config)
 }
@@ -39,16 +41,16 @@ func TestDownloadEpisode(t *testing.T) {
 	trackerMock := getTrackerMock()
 	dm := buildDownloadManager()
 	dm.Tracker = &trackerMock
-	dm.downloadEpisode(serie_link, episode_number, getSerieConfiguration(), &generalDonwloaderServiceMock)
+	dm.downloadEpisode(serieLink, episodeNumber, getSerieConfiguration(), &generalDonwloaderServiceMock)
 
 }
 
 func TestDownloadLastEpisode(t *testing.T) {
-	assert.Empty(t, buildDownloadManager().DownloadLastEpisode(serie_link))
+	assert.Empty(t, buildDownloadManager().DownloadLastEpisode(serieLink))
 }
 
 func TestDownloadAlltEpisodes(t *testing.T) {
-	assert.Empty(t, buildDownloadManager().DownloadAllEpisodes(serie_link))
+	assert.Empty(t, buildDownloadManager().DownloadAllEpisodes(serieLink))
 }
 
 //testTarget
@@ -67,14 +69,14 @@ func buildDownloadManager() DownloaderManager {
 //mocks building
 func getFileSystemManagerMock() serviceMock.FileSystemManager {
 	fileSystemMock := serviceMock.FileSystemManager{}
-	fileSystemMock.On("Save", output_path+"/"+serie_name, episode_number+"."+file_format, io.NopCloser(strings.NewReader(file_data))).Return(nil)
+	fileSystemMock.On("Save", outputPath+"/"+serieName, episodeNumber+"."+fileFormat, io.NopCloser(strings.NewReader(fileData))).Return(nil)
 	return fileSystemMock
 }
 
 func getTrackerMock() serviceMock.TrackerService {
 	trackerMock := serviceMock.TrackerService{}
-	trackerMock.On("IsPreviouslyDownloaded", serie_name, episode_number).Return(false)
-	trackerMock.On("SaveAlreadyDownloaded", serie_name, episode_number).Return()
+	trackerMock.On("IsPreviouslyDownloaded", serieName, episodeNumber).Return(false)
+	trackerMock.On("SaveAlreadyDownloaded", serieName, episodeNumber).Return()
 	return trackerMock
 
 }
@@ -82,19 +84,19 @@ func getTrackerMock() serviceMock.TrackerService {
 func getGeneralDownloaderMock() portMock.GeneralDownloadService {
 	generalDonwloaderServiceMock := portMock.GeneralDownloadService{}
 
-	generalDonwloaderServiceMock.On("DownloadEpisodeFromLink", serie_link, episode_number).Return(io.NopCloser(strings.NewReader(file_data)), "format", nil)
-	generalDonwloaderServiceMock.On("GetSortedEpisodesAvaliable", serie_link).Return([]string{episode_number}, nil)
+	generalDonwloaderServiceMock.On("DownloadEpisodeFromLink", serieLink, episodeNumber).Return(io.NopCloser(strings.NewReader(fileData)), "format", nil)
+	generalDonwloaderServiceMock.On("GetSortedEpisodesAvaliable", serieLink).Return([]string{episodeNumber}, nil)
 
 	return generalDonwloaderServiceMock
 }
 
 func getAppConfiguration() AppConfiguration {
 	return AppConfiguration{
-		OutputPath:          output_path,
+		OutputPath:          outputPath,
 		SerieConfigurations: []SerieConfiguration{getSerieConfiguration()},
 	}
 }
 
 func getSerieConfiguration() SerieConfiguration {
-	return SerieConfiguration{SerieLink: serie_link, SerieName: serie_name, Provider: provider}
+	return SerieConfiguration{SerieLink: serieLink, SerieName: serieName, Provider: provider}
 }
