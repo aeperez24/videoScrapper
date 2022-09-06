@@ -41,8 +41,3 @@ type httpPostClient interface {
 	PostForm(url string, data url.Values) (resp *http.Response, err error)
 	Get(url string) (*http.Response, error)
 }
-
-func removeElement(in []string, pos int) []string {
-	return append(in[0:pos], in[pos:]...)
-
-}

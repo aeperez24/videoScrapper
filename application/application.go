@@ -25,7 +25,7 @@ func NewApplication() Application {
 
 	configureLogs(appConfig)
 	servicesMap := initializeDownloadServices(appConfig)
-	downloaderManager := service.DownloaderManager{FileSystemManager: service.FileSystemManagerWrapper{},
+	downloaderManager := service.DownloaderManagerImpl{FileSystemManager: service.FileSystemManagerWrapper{},
 		AppConfiguration: appConfig, DownloaderServices: servicesMap, Tracker: service.TrackerServiceImpl{FileSystemManager: service.FileSystemManagerWrapper{}},
 	}
 	return Application{
@@ -37,7 +37,11 @@ func NewApplication() Application {
 }
 
 func loadConfiguration() service.AppConfiguration {
-	appConfig, err := service.LoadConfig("./")
+	return loadConfigurationWithPath("./")
+}
+
+func loadConfigurationWithPath(configPath string) service.AppConfiguration {
+	appConfig, err := service.LoadConfig(configPath)
 
 	if err != nil {
 		log.Fatal(err)
@@ -45,7 +49,6 @@ func loadConfiguration() service.AppConfiguration {
 	}
 	return *appConfig
 }
-
 func configureLogs(appConfig service.AppConfiguration) {
 	if appConfig.LogsPath != "" {
 		logFile, err := os.OpenFile(appConfig.LogsPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)

@@ -17,14 +17,19 @@ type AppConfiguration struct {
 	LogsPath            string
 }
 
-type DownloaderManager struct {
+type DownloaderManagerImpl struct {
 	FileSystemManager  FileSystemManager
 	AppConfiguration   AppConfiguration
 	DownloaderServices map[string]port.GeneralDownloadService
 	Tracker            TrackerService
 }
 
-func (dm DownloaderManager) getSerieNameFromLink(link string) string {
+type DownloaderManager interface {
+	DownloadLastEpisode(SerieLink string) []error
+	DownloadAllEpisodes(SerieLink string) []error
+}
+
+func (dm DownloaderManagerImpl) getSerieNameFromLink(link string) string {
 	animeConfgs := dm.AppConfiguration.SerieConfigurations
 	for _, config := range animeConfgs {
 		if config.SerieLink == link {
@@ -34,7 +39,7 @@ func (dm DownloaderManager) getSerieNameFromLink(link string) string {
 	return ""
 }
 
-func (dm DownloaderManager) getConfigFromLink(link string) (SerieConfiguration, error) {
+func (dm DownloaderManagerImpl) getConfigFromLink(link string) (SerieConfiguration, error) {
 	animeConfgs := dm.AppConfiguration.SerieConfigurations
 	for _, config := range animeConfgs {
 		if config.SerieLink == link {
@@ -43,7 +48,7 @@ func (dm DownloaderManager) getConfigFromLink(link string) (SerieConfiguration, 
 	}
 	return SerieConfiguration{}, errors.New(fmt.Sprintf("configuratio not found for %v", link))
 }
-func (dm DownloaderManager) DownloadLastEpisode(SerieLink string) []error {
+func (dm DownloaderManagerImpl) DownloadLastEpisode(SerieLink string) []error {
 	animeConfig, err := dm.getConfigFromLink(SerieLink)
 	if err != nil {
 		return []error{err}
@@ -65,7 +70,7 @@ func (dm DownloaderManager) DownloadLastEpisode(SerieLink string) []error {
 	return []error{}
 }
 
-func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber string,
+func (dm DownloaderManagerImpl) downloadEpisode(serieLink string, episodeNumber string,
 	serieConfig SerieConfiguration, downloadService port.GeneralDownloadService) (string, error) {
 
 	isDownloaded := dm.Tracker.IsPreviouslyDownloaded(serieConfig.SerieName, episodeNumber)
@@ -84,7 +89,7 @@ func (dm DownloaderManager) downloadEpisode(serieLink string, episodeNumber stri
 	return "", nil
 }
 
-func (dm DownloaderManager) DownloadAllEpisodes(SerieLink string) []error {
+func (dm DownloaderManagerImpl) DownloadAllEpisodes(SerieLink string) []error {
 	animeConfig, err := dm.getConfigFromLink(SerieLink)
 	if err != nil {
 		return []error{err}

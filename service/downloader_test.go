@@ -54,11 +54,11 @@ func TestDownloadAlltEpisodes(t *testing.T) {
 }
 
 //testTarget
-func buildDownloadManager() DownloaderManager {
+func buildDownloadManager() DownloaderManagerImpl {
 	fileSystemMock := getFileSystemManagerMock()
 	trackerMock := getTrackerMock()
 	generalDownloaderMock := getGeneralDownloaderMock()
-	return DownloaderManager{
+	return DownloaderManagerImpl{
 		AppConfiguration:   getAppConfiguration(),
 		FileSystemManager:  &fileSystemMock,
 		DownloaderServices: map[string]port.GeneralDownloadService{provider: &generalDownloaderMock},
