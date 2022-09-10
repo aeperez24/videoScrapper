@@ -5,8 +5,9 @@ test:
 build: test
 	go build
 
-buildImage: test
+buildImage: 
 	docker build -t videoscrapper .
+
 
 runDocker: buildImage
 	docker run -it --rm -v "$(DOCKER_OUTPUT_PATH):/output/" -v "$(DOCKER_APPLICATION_HOME):/home/" videoscrapper
@@ -26,6 +27,9 @@ generateMocks:
 get-mockery:
 	go install github.com/vektra/mockery/v2@latest
 
+
+get-lintern:
+	go install honnef.co/go/tools/cmd/staticcheck@latest
 
 
 
