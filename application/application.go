@@ -37,10 +37,10 @@ func NewApplication() Application {
 }
 
 func loadConfiguration() service.AppConfiguration {
-	return loadConfigurationWithPath("./")
+	return LoadConfigurationWithPath("./")
 }
 
-func loadConfigurationWithPath(configPath string) service.AppConfiguration {
+func LoadConfigurationWithPath(configPath string) service.AppConfiguration {
 	appConfig, err := service.LoadConfig(configPath)
 
 	if err != nil {

@@ -29,7 +29,7 @@ func TestRun(t *testing.T) {
 }
 
 func TestLoadConfig(t *testing.T) {
-	config := loadConfigurationWithPath("../")
+	config := LoadConfigurationWithPath("../")
 	assert.Equal(t, "/Users/path/downloads", config.OutputPath)
 	assert.Equal(t, "cuevana|animeshow", config.SerieConfigurations[0].Provider)
 	assert.Equal(t, "serieLink", config.SerieConfigurations[0].SerieLink)
@@ -39,7 +39,7 @@ func TestLoadConfig(t *testing.T) {
 
 func TestInitializeDownloadServicesl(t *testing.T) {
 	expectedServices := []string{"animeshow", "cuevana"}
-	config := loadConfigurationWithPath("../")
+	config := LoadConfigurationWithPath("../")
 	serviceMap := initializeDownloadServices(config)
 	for _, service := range expectedServices {
 		_, isContained := serviceMap[service]
