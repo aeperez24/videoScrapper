@@ -12,7 +12,7 @@ const EDITOR_CONFIG_NAME = "editor"
 const CONFIG_PATH_VAR_NAME = "WCH_PATH"
 
 func GetProviders() []string {
-	providerList := []string{"animeShow", "cuevana"}
+	providerList := []string{"animeshow", "cuevana"}
 	return providerList
 
 }

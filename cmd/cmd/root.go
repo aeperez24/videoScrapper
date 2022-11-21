@@ -25,7 +25,7 @@ var addSerieNewName string
 var addSerieNewProvider string
 
 var rootCmd = &cobra.Command{
-	Use: "wchditor",
+	Use: "wch",
 
 	Run: func(cmd *cobra.Command, args []string) {
 
