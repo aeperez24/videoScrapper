@@ -91,6 +91,7 @@ func (app Application) Run() {
 }
 
 func asyncDownload(fn func(string) []error, in string, errorChanel chan []error) {
+	defer close(errorChanel)
 	err := fn(in)
 	errorChanel <- err
 }
